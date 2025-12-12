@@ -222,7 +222,6 @@ macro(RenameBinaryAliases targetName toolNames)
 endmacro()
 
 macro(AddBinaryAliases targetName toolNames)
-	set(targetAliases "${targetName}-aliases")
 	add_custom_target(${targetName}-aliases ALL)
 	add_dependencies(${targetName} ${targetName}-aliases)
 	add_dependencies(${targetName}-aliases ${targetName}-binaries)
