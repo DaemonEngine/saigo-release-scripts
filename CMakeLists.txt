@@ -92,7 +92,7 @@ if (USE_LTO AND NOT MINGW)
 	if (COMPILER_CLANG)
 		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=thin -fno-fat-lto-objects")
 	else()
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto -fno-fat-lto-objects")
+		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=auto -fno-fat-lto-objects")
 	endif()
 
 	set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
