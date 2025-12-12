@@ -437,8 +437,8 @@ if (BUILD_BINUTILS)
 		INSTALL_COMMAND install-strip
 	)
 
-	set(binutilsToolNames addr2line;ar;as;c++filt;elfedit;gprof;nm;objcopy;objdump;ranlib;readelf;size;strings;strip;ld;ld.bfd) # ld.gold
-	set(binutilsDirectoryToolNames ar;as;ld;ld.bfd;nm;objcopy;objdump;ranlib;strip) # ld.gold
+	set(binutilsToolNames addr2line;ar;as;c++filt;elfedit;gprof;nm;objcopy;objdump;ranlib;readelf;size;strings;strip;ld;ld.bfd)
+	set(binutilsDirectoryToolNames ar;as;ld;ld.bfd;nm;objcopy;objdump;ranlib;strip)
 
 	AddBinaryAliases(binutils "${binutilsToolNames}")
 	AddDirectoryAliases(binutils "${binutilsDirectoryToolNames}")
