@@ -106,20 +106,20 @@ set(EP_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS}")
 option(CLONE_SHARED_REPOSITORIES "Clone shared sources dir (and only do that)." OFF)
 
 if (CLONE_SHARED_REPOSITORIES)
-	set(DEFAULT_SHARED_REPOSITORIES ${CMAKE_CURRENT_BINARY_DIR})
+	set(DEFAULT_SHARED_REPOSITORIES "${CMAKE_CURRENT_BINARY_DIR}")
 else()
 	set(DEFAULT_SHARED_REPOSITORIES "")
 endif()
 
-set(SHARED_REPOSITORIES_DIR ${DEFAULT_SHARED_REPOSITORIES_DIR} CACHE PATH "Shared repositories dir (doesn't use any if empty).")
+set(SHARED_REPOSITORIES_DIR "${DEFAULT_SHARED_REPOSITORIES_DIR}" CACHE PATH "Shared repositories dir (doesn't use any if empty).")
 
 set(EXTERNAL_PROJECT_BASE ExternalProjects)
-set_directory_properties(PROPERTIES EP_BASE ${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_PROJECT_BASE})
+set_directory_properties(PROPERTIES EP_BASE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_PROJECT_BASE}")
 
 if (CLONE_SHARED_REPOSITORIES)
-	set(EXTERNAL_PROJECT_SOURCES_DIR ${CMAKE_BINARY_DIR})
+	set(EXTERNAL_PROJECT_SOURCES_DIR "${CMAKE_BINARY_DIR}")
 else()
-	set(EXTERNAL_PROJECT_SOURCES_DIR ${EXTERNAL_PROJECT_BASE}/Sources)
+	set(EXTERNAL_PROJECT_SOURCES_DIR "${EXTERNAL_PROJECT_BASE}/Sources")
 endif()
 
 set(PATCH_BINUTILS
@@ -129,21 +129,21 @@ set(PATCH_BINUTILS
 )
 
 macro(AddGitProject SLUG NAME DIR URL TAG)
-	set(GIT_REPOSITORY_${SLUG} ${URL} CACHE STRING "${NAME} git repository location.")
+	set(GIT_REPOSITORY_${SLUG} "${URL}" CACHE STRING "${NAME} git repository location.")
 	mark_as_advanced(GIT_REPOSITORY_${SLUG})
 
-	set(REPOSITORY_DIR_${SLUG} ${DIR})
-	set(REPOSITORY_TAG_${SLUG} ${TAG})
+	set(REPOSITORY_DIR_${SLUG} "${DIR}")
+	set(REPOSITORY_TAG_${SLUG} "${TAG}")
 
 	if (CLONE_SHARED_REPOSITORIES)
 		option(CLONE_${SLUG} "Clone the ${NAME} repository." ON)
 
 		if (CLONE_${SLUG})
-			ExternalProject_Add(${REPOSITORY_DIR_${SLUG}}-shared-repository
-				SOURCE_DIR ${DIR}
-				GIT_REPOSITORY ${GIT_REPOSITORY_${SLUG}}
-				GIT_TAG ${TAG}
-				PATCH_COMMAND ${PATCH_${SLUG}}
+			ExternalProject_Add("${REPOSITORY_DIR_${SLUG}}-shared-repository"
+				SOURCE_DIR "${DIR}"
+				GIT_REPOSITORY "${GIT_REPOSITORY_${SLUG}}"
+				GIT_TAG "${TAG}"
+				PATCH_COMMAND "${PATCH_${SLUG}}"
 				CONFIGURE_COMMAND echo
 				BUILD_COMMAND echo
 				INSTALL_COMMAND echo
@@ -154,21 +154,21 @@ macro(AddGitProject SLUG NAME DIR URL TAG)
 	endif()
 
 	if (SHARED_REPOSITORIES_DIR)
-		set(SOURCE_DIR_${SLUG} ${SHARED_REPOSITORIES_DIR}/${DIR})
+		set(SOURCE_DIR_${SLUG} "${SHARED_REPOSITORIES_DIR}/${DIR}")
 
 		set(EP_OPTIONS_${SLUG}
 			SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
 		)
 	else()
-		set(EP_SOURCE_DIR_${SLUG} ${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR})
+		set(EP_SOURCE_DIR_${SLUG} "${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR}")
 		set(SOURCE_DIR_${SLUG} "${CMAKE_BINARY_DIR}/${EP_SOURCE_DIR_${SLUG}}")
-		set(REPOSITORY_${SLUG} ${GIT_REPOSITORY_${SLUG}})
+		set(REPOSITORY_${SLUG} "${GIT_REPOSITORY_${SLUG}}")
 
 		set(EP_OPTIONS_${SLUG}
 			SOURCE_DIR "${EP_SOURCE_DIR_${SLUG}}"
 			GIT_REPOSITORY "${REPOSITORY_${SLUG}}"
 			GIT_TAG "${REPOSITORY_TAG_${SLUG}}"
-			PATCH_COMMAND ${PATCH_${SLUG}}
+			PATCH_COMMAND "${PATCH_${SLUG}}"
 		)
 	endif()
 endmacro()
@@ -195,25 +195,25 @@ macro(RenameBinaryAliases targetName toolNames)
 	add_dependencies(${targetName} ${targetName}-renames)
 	add_dependencies(${targetName} ${targetName}-renames ${targetName}-binaries)
 
-	set(targetPath ${CMAKE_INSTALL_PREFIX}/bin/${targetName}${CMAKE_EXECUTABLE_SUFFIX})
-	set(referenceName ${targetName}-reference)
-	set(referencePath ${EXTERNAL_PROJECT_BASE}/tmp/${referenceName}${CMAKE_EXECUTABLE_SUFFIX})
+	set(targetPath "${CMAKE_INSTALL_PREFIX}/bin/${targetName}${CMAKE_EXECUTABLE_SUFFIX}")
+	set(referenceName "${targetName}-reference")
+	set(referencePath "${EXTERNAL_PROJECT_BASE}/tmp/${referenceName}${CMAKE_EXECUTABLE_SUFFIX}")
 
 	add_custom_target(${referenceName}
 		ALL
-		COMMAND cp -P ${targetPath} ${referencePath}
+		COMMAND cp -P "${targetPath}" "${referencePath}"
 		DEPENDS ${targetName}-binaries
 	)
 
 	add_dependencies(${targetName} ${referenceName})
 
 	foreach(toolName ${toolNames})
-		set(aliasName ${REFERENCE_ARCH_NAME}-nacl-${toolName})
-		set(aliasPath ${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX})
+		set(aliasName "${REFERENCE_ARCH_NAME}-nacl-${toolName}")
+		set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX}")
 
 		add_custom_target(${aliasName}
 			ALL
-			COMMAND cp -P ${referencePath} ${aliasPath}
+			COMMAND cp -P "${referencePath}" "${aliasPath}"
 			DEPENDS ${referenceName}
 		)
 
@@ -222,20 +222,20 @@ macro(RenameBinaryAliases targetName toolNames)
 endmacro()
 
 macro(AddBinaryAliases targetName toolNames)
-	set(targetAliases ${targetName}-aliases)
+	set(targetAliases "${targetName}-aliases")
 	add_custom_target(${targetName}-aliases ALL)
 	add_dependencies(${targetName} ${targetName}-aliases)
 	add_dependencies(${targetName}-aliases ${targetName}-binaries)
 
 	foreach(archName ${ALIAS_ARCH_NAMES})
 		foreach(toolName ${toolNames})
-			set(referenceName ${REFERENCE_ARCH_NAME}-nacl-${toolName}${CMAKE_EXECUTABLE_SUFFIX})
-			set(aliasName ${archName}-nacl-${toolName})
-			set(aliasPath ${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX})
+			set(referenceName "${REFERENCE_ARCH_NAME}-nacl-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
+			set(aliasName "${archName}-nacl-${toolName}")
+			set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX}")
 
 			add_custom_target(${aliasName}
 				ALL
-				COMMAND ln -sf ${referenceName} ${aliasPath}
+				COMMAND ln -sf "${referenceName}" "${aliasPath}"
 				DEPENDS ${targetName}-binaries
 			)
 
@@ -249,15 +249,15 @@ macro(AddDirectoryAliases targetName toolNames)
 	add_dependencies(${targetName} ${targetName}-directory-aliases)
 	add_dependencies(${targetName}-directory-aliases ${targetName}-binaries)
 
-	set(referenceName ${REFERENCE_ARCH_NAME}-nacl)
+	set(referenceName "${REFERENCE_ARCH_NAME}-nacl")
 
 	foreach(archName ${ALIAS_ARCH_NAMES})
-		set(aliasName ${archName}-nacl)
-		set(aliasPath ${CMAKE_INSTALL_PREFIX}/${aliasName})
+		set(aliasName "${archName}-nacl")
+		set(aliasPath "${CMAKE_INSTALL_PREFIX}/${aliasName}")
 
 		add_custom_target(${aliasName}-directory
 			ALL
-			COMMAND mkdir -p ${aliasPath}
+			COMMAND mkdir -p "${aliasPath}"
 			DEPENDS ${targetName}-binaries
 		)
 
@@ -265,7 +265,7 @@ macro(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}-bin-directory
 			ALL
-			COMMAND ln -sfn ../${referenceName}/bin ${aliasPath}/bin
+			COMMAND ln -sfn "../${referenceName}/bin" "${aliasPath}/bin"
 			DEPENDS ${aliasName}-directory
 		)
 
@@ -273,7 +273,7 @@ macro(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}-lib-directory
 			ALL
-			COMMAND mkdir -p ${aliasPath}/lib
+			COMMAND mkdir -p "${aliasPath}/lib"
 			DEPENDS ${aliasName}-directory
 		)
 
@@ -281,7 +281,7 @@ macro(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}-ldscripts-directory
 			ALL
-			COMMAND ln -sfn ../../${referenceName}/lib/ldscripts ${aliasPath}/lib/ldscripts
+			COMMAND ln -sfn "../../${referenceName}/lib/ldscripts" "${aliasPath}/lib/ldscripts"
 			DEPENDS ${aliasName}-lib-directory
 		)
 
@@ -289,11 +289,11 @@ macro(AddDirectoryAliases targetName toolNames)
 	endforeach()
 
 	foreach(toolName ${toolNames})
-		set(toolPath ${CMAKE_INSTALL_PREFIX}/${referenceName}/bin/${toolName})
+		set(toolPath "${CMAKE_INSTALL_PREFIX}/${referenceName}/bin/${toolName}")
 
 		add_custom_target(${targetName}-${toolName}-delete
 			ALL
-			COMMAND rm -f ${toolPath}
+			COMMAND rm -f "${toolPath}"
 			DEPENDS ${targetName}-binaries
 		)
 
@@ -301,7 +301,7 @@ macro(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${targetName}-${toolName}-alias
 			ALL
-			COMMAND ln -sf ../../bin/${referenceName}-${toolName} ${toolPath}
+			COMMAND ln -sf "../../bin/${referenceName}-${toolName}" "${toolPath}"
 			DEPENDS ${targetName}-${toolName}-delete
 		)
 
@@ -310,15 +310,15 @@ macro(AddDirectoryAliases targetName toolNames)
 endmacro()
 
 if (CMAKE_OSX_DEPLOYMENT_TARGET)
-	set(EP_CMAKE_ARGS ${EP_CMAKE_ARGS} "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+	list(APPEND EP_CMAKE_ARGS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif()
 
 if (CMAKE_TOOLCHAIN_FILE)
-	set(EP_CMAKE_ARGS ${EP_CMAKE_ARGS} "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+	list(APPEND EP_CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
 else()
 	# This is expected when cross-compiling, also sets CMAKE_CROSSCOMPILING.
 	# See: https://llvm.org/docs/HowToCrossCompileLLVM.html
-	set(EP_CMAKE_ARGS ${EP_CMAKE_ARGS} "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+	list(APPEND EP_CMAKE_ARGS "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
 if (BUILD_CLANG)
@@ -334,8 +334,8 @@ if (BUILD_CLANG)
 		${EP_OPTIONS_CLANG}
 		SOURCE_SUBDIR llvm
 		LIST_SEPARATOR |
-		CMAKE_GENERATOR ${EP_GENERATOR}
-		CMAKE_ARGS ${EP_CMAKE_ARGS}
+		CMAKE_GENERATOR "${EP_GENERATOR}"
+		CMAKE_ARGS "${EP_CMAKE_ARGS}"
 		CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
 		CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
 		CMAKE_ARGS "-DCMAKE_INSTALL_RPATH=${INSTALL_RPATH}"
@@ -378,7 +378,7 @@ if (BUILD_CLANG)
 endif()
 
 macro(addConfigureEnv NAME VALUE)
-	set(CONFIGURE_ENV ${CONFIGURE_ENV} "${NAME}=${VALUE}")
+	set(CONFIGURE_ENV "${CONFIGURE_ENV} ${NAME}=${VALUE}")
 endmacro()
 
 macro(addBinutilEnv NAME PATH)
