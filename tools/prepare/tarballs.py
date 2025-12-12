@@ -1,0 +1,62 @@
+#! /usr/bin/env python3
+
+import base64
+import json
+import os
+import requests
+
+url = 'https://chromium.googlesource.com/native_client/src/native_client.git/+/refs/heads/main/toolchain_revisions/saigo_newlib.json?format=TEXT'
+response = requests.get(url)
+decoded = base64.b64decode(response.content)
+content = json.loads(decoded)
+
+archs=["x86_64", "i686", "arm"]
+packs=["core_sdk_libs_saigo", "libcxx_saigo", "libs_support_saigo", "newlib_saigo"]
+
+data={}
+for arch in archs:
+	data[arch] = {}
+	for pack in packs:
+		data[arch][pack] = {}
+
+for archive in content["package_targets"]["linux_x86"]["archives"]:
+	name = archive["name"]
+	url = archive["url"]
+
+	for arch in archs:
+		for pack in packs:
+			if name == "{}_{}.tgz".format(pack, arch):
+				data[arch][pack]["url"] = url
+
+				file_name = url.split("/")[-1:][0]
+				target_name = "_".join(file_name.split("_")[:-1])
+				for a in ["x86_64", "i686", "arm"]:
+					if target_name.endswith("_{}".format(a)):
+						target_name = "{}-{}".format(a, target_name.replace("_{}".format(a), ""))
+				target_name = target_name.replace("_saigo", "")
+				target_name = target_name.replace("core_sdk_libs", "core")
+				target_name = target_name.replace("libs_support", "support")
+				target_name = target_name.replace("_", "-")
+				data[arch][pack]["target"] = target_name
+
+				if target_name.startswith("support_"):
+					data[arch][pack]["subdir"] = "lib"
+				else:
+					data[arch][pack]["subdir"] = "{}-nacl".format(arch)
+
+content = ""
+
+for arch in archs:
+	for pack in packs:
+		p = data[arch][pack]
+		content += """
+AddTarProject("{}"
+	"{}"
+	"{}"
+)""".format(p["target"], p["subdir"], p["url"])
+
+dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+file_path = os.path.join(dir_path, "tarballs.cmake")
+
+with open(file_path, "w", encoding="utf-8") as f:
+	f.write(content)

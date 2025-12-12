@@ -122,6 +122,75 @@ else()
 	set(EXTERNAL_PROJECT_SOURCES_DIR "${EXTERNAL_PROJECT_BASE}/Sources")
 endif()
 
+option(BUILD_SAIGOLIBS "Build saigolibs." ON)
+
+if (BUILD_SAIGOLIBS)
+	add_custom_target(saigolibs ALL)
+endif()
+
+macro(AddTarProject NAME SUBDIR URL)
+	list(APPEND LIBRARY_TARBALLS ${SLUG})
+	string(TOUPPER "${NAME}" SLUG)
+	set(DIR "${NAME}")
+	set(TARBALL_${SLUG} ${URL} CACHE STRING "${NAME} repository.")
+	mark_as_advanced(TARBALL_${SLUG})
+
+	if (SHARED_REPOSITORIES_DIR)
+		set(SOURCE_DIR_${SLUG} "${SHARED_REPOSITORIES_DIR}/${DIR}")
+	else()
+		set(SOURCE_DIR_${SLUG} "${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR}")
+	endif()
+
+	if (CLONE_SHARED_REPOSITORIES)
+		option(CLONE_${SLUG} "Clone the ${NAME}." ON)
+
+		if (CLONE_${SLUG})
+			ExternalProject_Add("${NAME}-directory"
+				URL "${URL}"
+				SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
+				CONFIGURE_COMMAND echo
+				BUILD_COMMAND echo
+				INSTALL_COMMAND echo
+				DOWNLOAD_EXTRACT_TIMESTAMP ON
+			)
+		endif()
+	else()
+		option(BUILD_${SLUG} "Build ${NAME}." ON)
+	endif()
+
+	if (SHARED_REPOSITORIES_DIR)
+		set(SOURCE_DIR_${SLUG} ${SHARED_REPOSITORIES_DIR}/${DIR})
+
+		set(EP_OPTIONS_${SLUG}
+			SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
+		)
+	else()
+		set(EP_SOURCE_DIR_${SLUG} ${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR})
+		set(SOURCE_DIR_${SLUG} "${CMAKE_BINARY_DIR}/${EP_SOURCE_DIR_${SLUG}}")
+
+		set(EP_OPTIONS_${SLUG}
+			SOURCE_DIR "${EP_SOURCE_DIR_${SLUG}}"
+			URL "${URL}"
+		)
+	endif()
+
+	if (BUILD_SAIGOLIBS AND BUILD_${SLUG})
+		ExternalProject_Add("${NAME}-binaries"
+			${EP_OPTIONS_${SLUG}}
+			CONFIGURE_COMMAND echo
+			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
+			BUILD_COMMAND && sh -c "([ -d lib32 ] && (mkdir -p lib && mv lib32/* lib/ && rmdir lib32)) || true"
+			INSTALL_COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR}"
+			INSTALL_COMMAND && rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR}/."
+			DOWNLOAD_EXTRACT_TIMESTAMP ON
+		)
+
+		add_dependencies(saigolibs ${NAME}-binaries)
+	endif()
+endmacro()
+
+include(tarballs.cmake)
+
 set(PATCH_BINUTILS
 	git reset --hard origin/main
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0001-gprof-makefile-fix-building-m-files.patch
@@ -378,7 +447,7 @@ if (BUILD_CLANG)
 endif()
 
 macro(addConfigureEnv NAME VALUE)
-	set(CONFIGURE_ENV "${CONFIGURE_ENV} ${NAME}=${VALUE}")
+	set(CONFIGURE_ENV ${CONFIGURE_ENV} "${NAME}=${VALUE}")
 endmacro()
 
 macro(addBinutilEnv NAME PATH)
