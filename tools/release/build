@@ -31,11 +31,8 @@ do
 
 	shared_dir="${repo_dir}/build/shared"
 
-	if [ ! -d "${shared_dir}" ]
-	then
-		cmake -B "${shared_dir}" "${cmake_args[@]}" -D'CLONE_SHARED_REPOSITORIES'='ON'
-		cmake --build "${shared_dir}"
-	fi
+	cmake -B "${shared_dir}" "${cmake_args[@]}" -D'CLONE_SHARED_REPOSITORIES'='ON'
+	cmake --build "${shared_dir}"
 
 	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
 
