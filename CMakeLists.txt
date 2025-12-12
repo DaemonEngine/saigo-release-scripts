@@ -130,7 +130,7 @@ set(PATCH_BINUTILS
 
 macro(AddGitProject SLUG NAME DIR URL TAG)
 	set(GIT_REPOSITORY_${SLUG} ${URL} CACHE STRING "${NAME} git repository location.")
-	mark_as_advanced(GIT_REPOSITORY_${SLANG})
+	mark_as_advanced(GIT_REPOSITORY_${SLUG})
 
 	set(REPOSITORY_DIR_${SLUG} ${DIR})
 	set(REPOSITORY_TAG_${SLUG} ${TAG})
