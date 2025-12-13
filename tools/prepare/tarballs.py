@@ -32,11 +32,12 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 				target_name = "_".join(file_name.split("_")[:-1])
 				for a in ["x86_64", "i686", "arm"]:
 					if target_name.endswith("_{}".format(a)):
-						target_name = "{}-{}".format(a, target_name.replace("_{}".format(a), ""))
+						target_name = target_name.replace("_{}".format(a), "")
 				target_name = target_name.replace("_saigo", "")
 				target_name = target_name.replace("core_sdk_libs", "core")
 				target_name = target_name.replace("libs_support", "support")
 				target_name = target_name.replace("_", "-")
+				target_name = "{}-{}".format(arch, target_name)
 				data[arch][pack]["target"] = target_name
 
 				if target_name.startswith("support_"):

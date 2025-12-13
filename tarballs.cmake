@@ -1,17 +1,17 @@
 
-AddTarProject("x86-64-core"
+AddTarProject("x86_64-core"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/core_sdk_libs_saigo_x86_64_66661f638c8413dfe326f1dc964aa80452e7c665.tgz"
 )
-AddTarProject("x86-64-libcxx"
+AddTarProject("x86_64-libcxx"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_x86_64_2eed47768333c50387107aa44f99050bf8099c36.tgz"
 )
-AddTarProject("x86-64-support"
+AddTarProject("x86_64-support"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_x86_64_3069b07460fdace69c3ba395ad8b5f1a32f6ceaa.tgz"
 )
-AddTarProject("x86-64-newlib"
+AddTarProject("x86_64-newlib"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/newlib_saigo_x86_64_d4cfa2a5a4b3758d5ead0dfb709816f9c2ed68f2.tgz"
 )
