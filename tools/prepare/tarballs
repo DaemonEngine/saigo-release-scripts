@@ -10,8 +10,13 @@ response = requests.get(url)
 decoded = base64.b64decode(response.content)
 content = json.loads(decoded)
 
-archs=["x86_64", "i686", "arm"]
-packs=["core_sdk_libs_saigo", "libcxx_saigo", "libs_support_saigo", "newlib_saigo"]
+archs = ["x86_64", "i686", "arm"]
+packs = {
+	"core_sdk_libs_saigo": "core",
+	"libcxx_saigo": "libcxx",
+	"libs_support_saigo": "support",
+	"newlib_saigo": "newlib",
+}
 
 data={}
 for arch in archs:
@@ -24,23 +29,12 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 	url = archive["url"]
 
 	for arch in archs:
-		for pack in packs:
+		for pack in packs.keys():
 			if name == "{}_{}.tgz".format(pack, arch):
 				data[arch][pack]["url"] = url
+				data[arch][pack]["target"] = "{}-{}".format(arch, packs[pack])
 
-				file_name = url.split("/")[-1:][0]
-				target_name = "_".join(file_name.split("_")[:-1])
-				for a in ["x86_64", "i686", "arm"]:
-					if target_name.endswith("_{}".format(a)):
-						target_name = target_name.replace("_{}".format(a), "")
-				target_name = target_name.replace("_", "-")
-				target_name = target_name.replace("-saigo", "")
-				target_name = target_name.replace("core-sdk-libs", "core")
-				target_name = target_name.replace("libs-support", "support")
-				target_name = "{}-{}".format(arch, target_name)
-				data[arch][pack]["target"] = target_name
-
-				if target_name.endswith("-support"):
+				if packs[pack] == "support":
 					data[arch][pack]["subdir"] = "lib"
 				else:
 					data[arch][pack]["subdir"] = "{}-nacl".format(arch)
@@ -48,7 +42,7 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 content = ""
 
 for arch in archs:
-	for pack in packs:
+	for pack in packs.keys():
 		p = data[arch][pack]
 		content += """
 AddTarProject("{}"
