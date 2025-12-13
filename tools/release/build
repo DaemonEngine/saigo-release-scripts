@@ -19,20 +19,30 @@ do
 
 	cmake_args=(-S "${repo_dir}" -G'Unix Makefiles')
 
-	if [ -n "${CMAKE_DEBUG:-}" ]
+	if [ "${CMAKE_DEBUG:-}" = 'ON' ]
 	then
 		cmake_args+=(--debug-output)
 	fi
 
-	if [ -n "${CMAKE_TRACE:-}" ]
+	if [ "${CMAKE_TRACE:-}" 'ON' ]
 	then
 		cmake_args+=(--trace)
 	fi
 
 	shared_dir="${repo_dir}/build/shared"
 
-	cmake -B "${shared_dir}" "${cmake_args[@]}" -D'CLONE_SHARED_REPOSITORIES'='ON'
-	cmake --build "${shared_dir}"
+	FORCE_PULL="${FORCE_PULL:-OFF}"
+
+	if [ ! -d "${shared_dir}" ]
+	then
+		FORCE_PULL='ON'
+	fi
+	
+	if [ "${FORCE_PULL}" = 'ON' ]
+	then
+		cmake -B "${shared_dir}" "${cmake_args[@]}" -D'CLONE_SHARED_REPOSITORIES'='ON'
+		cmake --build "${shared_dir}"
+	fi
 
 	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
 
