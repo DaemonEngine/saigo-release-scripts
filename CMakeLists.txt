@@ -138,6 +138,8 @@ macro(AddTarProject NAME SUBDIR URL)
 	list(APPEND LIBRARY_TARBALLS ${SLUG})
 	string(TOUPPER "${NAME}" SLUG)
 	set(DIR "${NAME}")
+	set(SUBDIR_${SLUG} "${SUBDIR}")
+
 	set(TARBALL_${SLUG} ${URL} CACHE STRING "${NAME} repository.")
 	mark_as_advanced(TARBALL_${SLUG})
 
@@ -185,8 +187,8 @@ macro(AddTarProject NAME SUBDIR URL)
 			${EP_OPTIONS_${SLUG}}
 			CONFIGURE_COMMAND echo
 			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
-			INSTALL_COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR}"
-			INSTALL_COMMAND && rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR}/."
+			INSTALL_COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}"
+			INSTALL_COMMAND && rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}/."
 			DOWNLOAD_EXTRACT_TIMESTAMP ON
 		)
 
