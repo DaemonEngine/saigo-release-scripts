@@ -7,7 +7,7 @@ include(CheckCompilerFlag)
 include(CheckLinkerFlag)
 include(ExternalProject)
 
-project(SaigoNativeClientToolchain)
+project(SaigoNativeClientToolchain C CXX)
 
 set(FLAGS_LIST "${CMAKE_C_FLAGS}")
 separate_arguments(FLAGS_LIST)
