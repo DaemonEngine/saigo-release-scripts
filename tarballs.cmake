@@ -8,7 +8,7 @@ AddTarProject("x86_64-libcxx"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_x86_64_2eed47768333c50387107aa44f99050bf8099c36.tgz"
 )
 AddTarProject("x86_64-support"
-	"x86_64-nacl"
+	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_x86_64_3069b07460fdace69c3ba395ad8b5f1a32f6ceaa.tgz"
 )
 AddTarProject("x86_64-newlib"
@@ -24,7 +24,7 @@ AddTarProject("i686-libcxx"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_i686_4b2b95f9de8e2292eea2513bc5516ba97633c255.tgz"
 )
 AddTarProject("i686-support"
-	"i686-nacl"
+	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_i686_e14a542fb9549bd6ac6bb9a0a58127f346f01706.tgz"
 )
 AddTarProject("i686-newlib"
@@ -40,7 +40,7 @@ AddTarProject("arm-libcxx"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_arm_37b6a1b0f8f4c1e67f19eb8fb6dfd4675a7e72d4.tgz"
 )
 AddTarProject("arm-support"
-	"arm-nacl"
+	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_arm_85492c8b2b577951e413f1ef1bd11cb19d44550b.tgz"
 )
 AddTarProject("arm-newlib"

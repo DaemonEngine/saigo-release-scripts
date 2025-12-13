@@ -33,14 +33,14 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 				for a in ["x86_64", "i686", "arm"]:
 					if target_name.endswith("_{}".format(a)):
 						target_name = target_name.replace("_{}".format(a), "")
-				target_name = target_name.replace("_saigo", "")
-				target_name = target_name.replace("core_sdk_libs", "core")
-				target_name = target_name.replace("libs_support", "support")
 				target_name = target_name.replace("_", "-")
+				target_name = target_name.replace("-saigo", "")
+				target_name = target_name.replace("core-sdk-libs", "core")
+				target_name = target_name.replace("libs-support", "support")
 				target_name = "{}-{}".format(arch, target_name)
 				data[arch][pack]["target"] = target_name
 
-				if target_name.startswith("support_"):
+				if target_name.endswith("-support"):
 					data[arch][pack]["subdir"] = "lib"
 				else:
 					data[arch][pack]["subdir"] = "{}-nacl".format(arch)
