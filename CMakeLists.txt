@@ -202,7 +202,8 @@ set(PATCH_BINUTILS
 	&& git rebase --committer-date-is-author-date origin/main
 )
 
-macro(AddGitProject SLUG NAME DIR URL TAG)
+macro(AddGitProject NAME DIR URL TAG)
+	string(TOUPPER "${NAME}" SLUG)
 	set(GIT_REPOSITORY_${SLUG} "${URL}" CACHE STRING "${NAME} git repository location.")
 	mark_as_advanced(GIT_REPOSITORY_${SLUG})
 
@@ -247,15 +248,13 @@ macro(AddGitProject SLUG NAME DIR URL TAG)
 	endif()
 endmacro()
 
-AddGitProject("CLANG"
-	"NaCl Saigo clang compiler"
+AddGitProject("clang"
 	"llvm-project"
 	"https://chromium.googlesource.com/native_client/nacl-llvm-project-v10.git"
 	"main"
 )
 
-AddGitProject("BINUTILS"
-	"NaCl binutils"
+AddGitProject("binutils"
 	"binutils"
 	"https://chromium.googlesource.com/native_client/nacl-binutils.git"
 	"main"
