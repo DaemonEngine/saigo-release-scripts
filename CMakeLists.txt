@@ -185,7 +185,6 @@ macro(AddTarProject NAME SUBDIR URL)
 			${EP_OPTIONS_${SLUG}}
 			CONFIGURE_COMMAND echo
 			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
-			BUILD_COMMAND && sh -c "([ -d lib32 ] && (mkdir -p lib && mv lib32/* lib/ && rmdir lib32)) || true"
 			INSTALL_COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR}"
 			INSTALL_COMMAND && rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR}/."
 			DOWNLOAD_EXTRACT_TIMESTAMP ON
@@ -516,10 +515,10 @@ if (BUILD_BINUTILS)
 	AddBinaryAliases(binutils "${binutilsToolNames}")
 	AddDirectoryAliases(binutils "${binutilsDirectoryToolNames}")
 
-	add_custom_target(binutils-lib32-alias ALL
+	add_custom_target(binutils-lib64-alias ALL
 		COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/x86_64-nacl"
-		&& ln -sfn ../i686-nacl/lib "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/lib32"
+		&& ln -sfn lib "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/lib64"
 	)
 
-	add_dependencies(binutils-aliases binutils-lib32-alias)
+	add_dependencies(binutils-aliases binutils-lib64-alias)
 endif()

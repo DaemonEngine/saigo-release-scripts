@@ -28,16 +28,22 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 	name = archive["name"]
 	url = archive["url"]
 
-	for arch in archs:
+	for arch in archs + ["x86_32"]:
 		for pack in packs.keys():
 			if name == "{}_{}.tgz".format(pack, arch):
 				data[arch][pack]["url"] = url
 				data[arch][pack]["target"] = "{}-{}".format(arch, packs[pack])
 
+				# Workaround stupid CMake's “feature” that strips the first directory.
+				if arch == "i686":
+					dir_arch = "x86_64"
+				else:
+					dir_arch = arch
+
 				if packs[pack] == "support":
 					data[arch][pack]["subdir"] = "lib"
 				else:
-					data[arch][pack]["subdir"] = "{}-nacl".format(arch)
+					data[arch][pack]["subdir"] = "{}-nacl".format(dir_arch)
 
 content = ""
 
