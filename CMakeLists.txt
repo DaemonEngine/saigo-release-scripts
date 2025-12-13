@@ -3,105 +3,111 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-include(CheckCompilerFlag)
-include(CheckLinkerFlag)
+project(SaigoNativeClientToolchain LANGUAGES NONE)
+
 include(ExternalProject)
 
-project(SaigoNativeClientToolchain C CXX)
+if (NOT CLONE_SHARED_REPOSITORIES)
+	enable_language(C)
+	enable_language(CXX)
 
-set(FLAGS_LIST "${CMAKE_C_FLAGS}")
-separate_arguments(FLAGS_LIST)
+	include(CheckCompilerFlag)
+	include(CheckLinkerFlag)
 
-execute_process(
-	COMMAND "${CMAKE_C_COMPILER}" ${FLAGS_LIST} -dumpmachine
-	OUTPUT_VARIABLE TRIPLE_HOST
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+	set(FLAGS_LIST "${CMAKE_C_FLAGS}")
+	separate_arguments(FLAGS_LIST)
 
-execute_process(
-	COMMAND cc -dumpmachine
-	OUTPUT_VARIABLE TRIPLE_BUILD
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+	execute_process(
+		COMMAND "${CMAKE_C_COMPILER}" ${FLAGS_LIST} -dumpmachine
+		OUTPUT_VARIABLE TRIPLE_HOST
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
 
-set(TRIPLE_TARGET x86_64-nacl)
+	execute_process(
+		COMMAND cc -dumpmachine
+		OUTPUT_VARIABLE TRIPLE_BUILD
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-	set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/prefix" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
-endif()
+	set(TRIPLE_TARGET x86_64-nacl)
 
-get_property(CMAKE_BUILD_TYPE_HELP CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING)
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
-set(CONFIGURE_COMPILER_FLAGS "-O3")
-
-find_program(PATH_CCACHE NAMES "ccache")
-find_program(PATH_NINJA NAMES "ninja")
-find_program(PATH_MOLD NAMES "mold")
-
-macro(FindTool SLUG FILE NAME)
-	find_program(PATH_${SLUG} NAMES ${FILE})
-
-	if (PATH_${SLUG})
-		set(FOUND_${SLUG} ON)
+	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/prefix" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
 	endif()
 
-	option(USE_${SLUG} "Enable ${NAME} when possible." ${FOUND_${SLUG}})
-endmacro()
+	get_property(CMAKE_BUILD_TYPE_HELP CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
+	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
-FindTool("CCACHE" "ccache" "ccache compiler cache")
-FindTool("NINJA" "ninja" "ninja builder")
-FindTool("MOLD" "mold" "mold linker")
+	find_program(PATH_CCACHE NAMES "ccache")
+	find_program(PATH_NINJA NAMES "ninja")
+	find_program(PATH_MOLD NAMES "mold")
 
-if (USE_CCACHE)
-	# Options come from LLVM CMakeLists.txt file.
-	set(ENV${CCACHE_CPP2} "yes")
-	set(ENV${CCACHE_HASHDIR} "yes")
-	set(EP_COMPILER_LAUNCHER "ccache")
-	set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
-	set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
-else()
-	set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
-	set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
-endif()
+	macro(FindTool SLUG FILE NAME)
+		find_program(PATH_${SLUG} NAMES ${FILE})
 
-if (USE_NINJA)
-	set(EP_GENERATOR "Ninja")
-else()
-	set(EP_GENERATOR "${CMAKE_GENERATOR}")
-endif()
+		if (PATH_${SLUG})
+			set(FOUND_${SLUG} ON)
+		endif()
 
-if (USE_MOLD AND NOT MINGW)
-	set(MOLD_FLAG "-fuse-ld=mold")
-	check_linker_flag("C" ${MOLD_FLAG} FUSE_LD_MOLD)
+		option(USE_${SLUG} "Enable ${NAME} when possible." ${FOUND_${SLUG}})
+	endmacro()
 
-	if (FUSE_LD_MOLD)
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} ${MOLD_FLAG}")
-		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
-	endif()
-endif()
+	FindTool("CCACHE" "ccache" "ccache compiler cache")
+	FindTool("NINJA" "ninja" "ninja builder")
+	FindTool("MOLD" "mold" "mold linker")
 
-if (CMAKE_OSX_DEPLOYMENT_TARGET)
-	set(COMPILER_FLAGS "${COMPILER_FLAGS} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-endif()
-
-check_compiler_flag("C" "-mllvm --color" COMPILER_CLANG)
-
-option(USE_LTO "Enable link-time optimization." ON)
-
-if (USE_LTO AND NOT MINGW)
-	if (COMPILER_CLANG)
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=thin -fno-fat-lto-objects")
+	if (USE_CCACHE)
+		# Options come from LLVM CMakeLists.txt file.
+		set(ENV${CCACHE_CPP2} "yes")
+		set(ENV${CCACHE_HASHDIR} "yes")
+		set(EP_COMPILER_LAUNCHER "ccache")
+		set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
+		set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
 	else()
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=auto -fno-fat-lto-objects")
+		set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
+		set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
 	endif()
 
-	set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
-endif()
+	if (USE_NINJA)
+		set(EP_GENERATOR "Ninja")
+	else()
+		set(EP_GENERATOR "${CMAKE_GENERATOR}")
+	endif()
 
-set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
-set(EP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
-set(EP_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS}")
+	if (USE_MOLD AND NOT MINGW)
+		set(MOLD_FLAG "-fuse-ld=mold")
+		check_linker_flag("C" ${MOLD_FLAG} FUSE_LD_MOLD)
+
+		if (FUSE_LD_MOLD)
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} ${MOLD_FLAG}")
+			set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
+		endif()
+	endif()
+
+	if (CMAKE_OSX_DEPLOYMENT_TARGET)
+		set(COMPILER_FLAGS "${COMPILER_FLAGS} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+	endif()
+
+	check_compiler_flag("C" "-mllvm --color" COMPILER_CLANG)
+
+	option(USE_LTO "Enable link-time optimization." ON)
+
+	if (USE_LTO AND NOT MINGW)
+		if (COMPILER_CLANG)
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=thin -fno-fat-lto-objects")
+		else()
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=auto -fno-fat-lto-objects")
+		endif()
+
+		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
+	endif()
+
+	set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
+	set(EP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
+	set(EP_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS}")
+endif()
 
 option(CLONE_SHARED_REPOSITORIES "Clone shared sources dir (and only do that)." OFF)
 
