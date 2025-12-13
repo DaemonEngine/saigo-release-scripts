@@ -262,7 +262,8 @@ AddGitProject("BINUTILS"
 )
 
 set(REFERENCE_ARCH_NAME x86_64)
-set(ALIAS_ARCH_NAMES i686;arm)
+set(ALIAS_BIN_ARCH_NAMES i686;arm)
+set(ALIAS_DIR_ARCH_NAMES arm)
 
 macro(RenameBinaryAliases targetName toolNames)
 	add_custom_target(${targetName}-renames ALL)
@@ -300,7 +301,7 @@ macro(AddBinaryAliases targetName toolNames)
 	add_dependencies(${targetName} ${targetName}-aliases)
 	add_dependencies(${targetName}-aliases ${targetName}-binaries)
 
-	foreach(archName ${ALIAS_ARCH_NAMES})
+	foreach(archName ${ALIAS_BIN_ARCH_NAMES})
 		foreach(toolName ${toolNames})
 			set(referenceName "${REFERENCE_ARCH_NAME}-nacl-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
 			set(aliasName "${archName}-nacl-${toolName}")
@@ -324,7 +325,7 @@ macro(AddDirectoryAliases targetName toolNames)
 
 	set(referenceName "${REFERENCE_ARCH_NAME}-nacl")
 
-	foreach(archName ${ALIAS_ARCH_NAMES})
+	foreach(archName ${ALIAS_DIR_ARCH_NAMES})
 		set(aliasName "${archName}-nacl")
 		set(aliasPath "${CMAKE_INSTALL_PREFIX}/${aliasName}")
 
