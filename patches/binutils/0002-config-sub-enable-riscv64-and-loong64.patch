@@ -1,0 +1,48 @@
+From 994060933b720636f288e61c6f75e144f474bc36 Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Fri, 19 Jun 2026 02:49:40 +0200
+Subject: [PATCH] config.sub: enable riscv64 and loong64
+
+---
+ config.sub | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/config.sub b/config.sub
+index 61cb4bc22d..d6070ccedb 100755
+--- a/config.sub
++++ b/config.sub
+@@ -268,6 +268,7 @@ case $basic_machine in
+ 	| k1om \
+ 	| le32 | le64 \
+ 	| lm32 \
++	| loongarch64 \
+ 	| m32c | m32r | m32rle | m68000 | m68k | m88k \
+ 	| maxq | mb | microblaze | microblazeel | mcore | mep | metag \
+ 	| mips | mipsbe | mipseb | mipsel | mipsle \
+@@ -301,6 +302,7 @@ case $basic_machine in
+ 	| pdp10 | pdp11 | pj | pjl \
+ 	| powerpc | powerpc64 | powerpc64le | powerpcle \
+ 	| pyramid \
++	| riscv64 \
+ 	| rl78 | rx \
+ 	| score \
+ 	| sh | sh[1234] | sh[24]a | sh[24]aeb | sh[23]e | sh[34]eb | sheb | shbe | shle | sh[1234]le | sh3ele \
+@@ -385,6 +387,7 @@ case $basic_machine in
+ 	| k1om-* \
+ 	| le32-* | le64-* \
+ 	| lm32-* \
++	| loongarch64-* \
+ 	| m32c-* | m32r-* | m32rle-* \
+ 	| m68000-* | m680[012346]0-* | m68360-* | m683?2-* | m68k-* \
+ 	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* \
+@@ -419,6 +422,7 @@ case $basic_machine in
+ 	| pdp10-* | pdp11-* | pj-* | pjl-* | pn-* | power-* \
+ 	| powerpc-* | powerpc64-* | powerpc64le-* | powerpcle-* \
+ 	| pyramid-* \
++	| riscv64-* \
+ 	| rl78-* | romp-* | rs6000-* | rx-* \
+ 	| sh-* | sh[1234]-* | sh[24]a-* | sh[24]aeb-* | sh[23]e-* | sh[34]eb-* | sheb-* | shbe-* \
+ 	| shle-* | sh[1234]le-* | sh3ele-* | sh64-* | sh64le-* \
+-- 
+2.43.0
+
