@@ -24,7 +24,7 @@ do
 		cmake_args+=(--debug-output)
 	fi
 
-	if [ "${CMAKE_TRACE:-}" 'ON' ]
+	if [ "${CMAKE_TRACE:-}" = 'ON' ]
 	then
 		cmake_args+=(--trace)
 	fi
