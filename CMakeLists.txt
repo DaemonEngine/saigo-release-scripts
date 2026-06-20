@@ -270,7 +270,7 @@ set(ALIAS_DIR_ARCH_NAMES arm)
 macro(RenameBinaryAliases targetName toolNames)
 	add_custom_target(${targetName}-renames ALL)
 	add_dependencies(${targetName} ${targetName}-renames)
-	add_dependencies(${targetName} ${targetName}-renames ${targetName}-binaries)
+	add_dependencies(${targetName}-renames ${targetName}-binaries)
 
 	set(targetPath "${CMAKE_INSTALL_PREFIX}/bin/${targetName}${CMAKE_EXECUTABLE_SUFFIX}")
 	set(referenceName "${targetName}-reference")
