@@ -287,8 +287,9 @@ function(RenameBinaryAliases targetName toolNames)
 	add_dependencies(${targetName} ${referenceName})
 
 	foreach(toolName ${toolNames})
-		set(aliasName "${REFERENCE_ARCH_NAME}-nacl-${toolName}")
-		set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX}")
+		set(aliasFile "${REFERENCE_ARCH_NAME}-nacl-${toolName}")
+		set(aliasName "${targetName}-${aliasFile}")
+		set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasFile}${CMAKE_EXECUTABLE_SUFFIX}")
 
 		add_custom_target(${aliasName}
 			ALL
@@ -309,8 +310,9 @@ function(AddBinaryAliases targetName toolNames)
 	foreach(archName ${ALIAS_BIN_ARCH_NAMES})
 		foreach(toolName ${toolNames})
 			set(referenceName "${REFERENCE_ARCH_NAME}-nacl-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
-			set(aliasName "${archName}-nacl-${toolName}")
-			set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasName}${CMAKE_EXECUTABLE_SUFFIX}")
+			set(aliasFile "${archName}-nacl-${toolName}")
+			set(aliasName "${targetName}-${aliasFile}")
+			set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasFile}${CMAKE_EXECUTABLE_SUFFIX}")
 
 			add_custom_target(${aliasName}
 				ALL
@@ -332,8 +334,9 @@ function(AddDirectoryAliases targetName toolNames)
 	set(referenceName "${REFERENCE_ARCH_NAME}-nacl")
 
 	foreach(archName ${ALIAS_DIR_ARCH_NAMES})
-		set(aliasName "${archName}-nacl")
-		set(aliasPath "${CMAKE_INSTALL_PREFIX}/${aliasName}")
+		set(aliasDir "${archName}-nacl")
+		set(aliasName "${targetName}-${aliasDir}")
+		set(aliasPath "${CMAKE_INSTALL_PREFIX}/${aliasDir}")
 
 		add_custom_target(${aliasName}-directory
 			ALL
