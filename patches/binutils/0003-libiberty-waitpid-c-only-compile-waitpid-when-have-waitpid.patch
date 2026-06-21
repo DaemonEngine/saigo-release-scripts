@@ -1,0 +1,29 @@
+From bf80aef0fadcd7426fa8523200b28f3a6566523c Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Sun, 21 Jun 2026 17:29:13 +0200
+Subject: [PATCH] libiberty/waitpid.c: only compile waitpid() when HAVE_WAITPID
+
+---
+ libiberty/waitpid.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libiberty/waitpid.c b/libiberty/waitpid.c
+index fd519d7696..5b8bb83689 100644
+--- a/libiberty/waitpid.c
++++ b/libiberty/waitpid.c
+@@ -10,6 +10,7 @@ does the return value.  The third argument is unused in @libib{}.
+ 
+ */
+ 
++#ifdef HAVE_WAITPID
+ #ifdef HAVE_CONFIG_H
+ #include "config.h"
+ #endif
+@@ -33,3 +34,4 @@ waitpid (pid_t pid, int *stat_loc, int options ATTRIBUTE_UNUSED)
+ 	return wpid;
+     }
+ }
++#endif
+-- 
+2.43.0
+

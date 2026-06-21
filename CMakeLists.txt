@@ -202,6 +202,7 @@ set(PATCH_BINUTILS
 	git reset --hard origin/main
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0001-gprof-makefile-fix-building-m-files.patch
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0002-config-sub-enable-riscv64-and-loong64.patch
+	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0003-libiberty-waitpid-c-only-compile-waitpid-when-have-waitpid.patch
 	&& git rebase --committer-date-is-author-date origin/main
 )
 
