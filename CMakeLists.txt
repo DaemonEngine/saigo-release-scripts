@@ -269,9 +269,10 @@ set(ALIAS_BIN_ARCH_NAMES i686;arm)
 set(ALIAS_DIR_ARCH_NAMES arm)
 
 function(RenameBinaryAliases targetName toolNames)
-	add_custom_target(${targetName}-renames ALL)
-	add_dependencies(${targetName} ${targetName}-renames)
-	add_dependencies(${targetName}-renames ${targetName}-binaries)
+	set(renamesName ${targetName}-renames)
+	add_custom_target(${renamesName} ALL)
+	add_dependencies(${targetName} ${renamesName})
+	add_dependencies(${renamesName} ${targetName}-binaries)
 
 	set(targetPath "${CMAKE_INSTALL_PREFIX}/bin/${targetName}${CMAKE_EXECUTABLE_SUFFIX}")
 	set(referenceName "${targetName}-reference")
@@ -295,14 +296,15 @@ function(RenameBinaryAliases targetName toolNames)
 			DEPENDS ${referenceName}
 		)
 
-		add_dependencies(${targetName}-renames ${aliasName})
+		add_dependencies(${renamesName} ${aliasName})
 	endforeach()
 endfunction()
 
 function(AddBinaryAliases targetName toolNames)
-	add_custom_target(${targetName}-aliases ALL)
-	add_dependencies(${targetName} ${targetName}-aliases)
-	add_dependencies(${targetName}-aliases ${targetName}-binaries)
+	set(aliasesName ${targetName}-aliases)
+	add_custom_target(${aliasesName} ALL)
+	add_dependencies(${targetName} ${aliasesName})
+	add_dependencies(${aliasesName} ${targetName}-binaries)
 
 	foreach(archName ${ALIAS_BIN_ARCH_NAMES})
 		foreach(toolName ${toolNames})
@@ -316,15 +318,16 @@ function(AddBinaryAliases targetName toolNames)
 				DEPENDS ${targetName}-binaries
 			)
 
-			add_dependencies(${targetName}-aliases ${aliasName})
+			add_dependencies(${aliasesName} ${aliasName})
 		endforeach()
 	endforeach()
 endfunction()
 
 function(AddDirectoryAliases targetName toolNames)
-	add_custom_target(${targetName}-directory-aliases ALL)
-	add_dependencies(${targetName} ${targetName}-directory-aliases)
-	add_dependencies(${targetName}-directory-aliases ${targetName}-binaries)
+	set(aliasesName ${targetName}-directory-aliases)
+	add_custom_target(${aliasesName} ALL)
+	add_dependencies(${targetName} ${aliasesName})
+	add_dependencies(${aliasesName} ${targetName}-binaries)
 
 	set(referenceName "${REFERENCE_ARCH_NAME}-nacl")
 
@@ -338,7 +341,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${targetName}-binaries
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${aliasName}-directory)
+		add_dependencies(${aliasesName} ${aliasName}-directory)
 
 		add_custom_target(${aliasName}-bin-directory
 			ALL
@@ -346,7 +349,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${aliasName}-directory
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${aliasName}-bin-directory)
+		add_dependencies(${aliasesName} ${aliasName}-bin-directory)
 
 		add_custom_target(${aliasName}-lib-directory
 			ALL
@@ -354,7 +357,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${aliasName}-directory
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${aliasName}-lib-directory)
+		add_dependencies(${aliasesName} ${aliasName}-lib-directory)
 
 		add_custom_target(${aliasName}-ldscripts-directory
 			ALL
@@ -362,7 +365,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${aliasName}-lib-directory
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${aliasName}-ldscripts-directory)
+		add_dependencies(${aliasesName} ${aliasName}-ldscripts-directory)
 	endforeach()
 
 	foreach(toolName ${toolNames})
@@ -374,7 +377,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${targetName}-binaries
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${targetName}-${toolName}-delete)
+		add_dependencies(${aliasesName} ${targetName}-${toolName}-delete)
 
 		add_custom_target(${targetName}-${toolName}-alias
 			ALL
@@ -382,7 +385,7 @@ function(AddDirectoryAliases targetName toolNames)
 			DEPENDS ${targetName}-${toolName}-delete
 		)
 
-		add_dependencies(${targetName}-directory-aliases ${targetName}-${toolName}-alias)
+		add_dependencies(${aliasesName} ${targetName}-${toolName}-alias)
 	endforeach()
 endfunction()
 
