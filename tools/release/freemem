@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+# Prints free memory in GB.
+
+set -e -u -o pipefail
+
+export LC_ALL='C.UTF-8'
+
+default_mem='8'
+
+case "$(uname -s)" in
+	'Linux')
+		free -g \
+		| awk '/^Mem:/ {print $7}'
+	;;
+	'Darwin')
+		vm_stat \
+		| awk '
+			/page size/ {
+				match($0, /[0-9]+/)
+				size=substr($0, RSTART, RLENGTH)
+			}
+			/Pages free/        { free=$3 }
+			/Pages inactive/    { inactive=$3 }
+			/Pages speculative/ { speculative=$3 }
+			END {
+				gsub("\\.","",free)
+				gsub("\\.","",inactive)
+				gsub("\\.","",speculative)
+				print int((free+inactive+speculative)*size/1024/1024/1024)
+			}'
+	;;
+	'FreeBSD')
+		sysctl -n \
+			vm.stats.vm.v_free_count \
+			vm.stats.vm.v_inactive_count \
+			vm.stats.vm.v_cache_count \
+			vm.stats.vm.v_page_size  \
+		| paste -s -d ' ' - \
+		| awk '
+			{
+				print int(($1+$2+$3)*$4/1024/1024/1024)
+			}'
+	;;
+	*)
+		echo "${default_mem}"
+	;;
+esac | head -n 1 | sed -e "s/^0$/${default_mem}/"

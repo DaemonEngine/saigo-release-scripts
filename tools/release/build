@@ -5,8 +5,15 @@ set -e -u
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 repo_dir="$(git rev-parse --show-toplevel)"
 
-export CMAKE_BUILD_PARALLEL_LEVEL="$("${script_dir}/nproc")"
-export MAKEFLAGS="-j${CMAKE_BUILD_PARALLEL_LEVEL}"
+# Some LLVM linking tasks may eat up 8GB each.
+nproc_count="$("${script_dir}/nproc")"
+mem_count="$(echo "$(${script_dir}/freemem) 8" | awk '{r = int($1 / $2); print (r < 1 ? 1 : r)}')"
+safer_count="$(echo "${nproc_count} ${mem_count}" | awk '{print ($1 < $2 ? $1 : $2)}')"
+
+echo "Using ${safer_count} jobs"
+
+export CMAKE_BUILD_PARALLEL_LEVEL="${safer_count}"
+export MAKEFLAGS="-j${safer_count}"
 
 for target_name in "${@}"
 do
