@@ -75,13 +75,31 @@ do
 
 	. "${conf_file}"
 
+	if [ -z "${USE_CCACHE:-}" ]
+	then
+		if command -v ccache >/dev/null 2>&1
+		then
+			USE_CCACHE='ON'
+		fi
+	fi
+
 	if [ -n "${USE_CCACHE:-}" ]
 	then
+		if [ "${USE_CCACHE}" = 'ON' ]
+		then
+			echo "Using Ccache"
+		fi
+
 		cmake_args+=(-D'USE_CCACHE'="${USE_CCACHE}")
 	fi
 
 	if [ -n "${USE_LTO:-}" ]
 	then
+		if [ "${USE_LTO}" = 'ON' ]
+		then
+			echo "Using LTO"
+		fi
+
 		cmake_args+=(-D'USE_LTO'="${USE_LTO}")
 	fi
 
