@@ -493,19 +493,25 @@ function(DeleteUselessLibDirectories targetName dirNames)
 	endforeach()
 endfunction()
 
-function(DeleteUselessLibexecDirectory targetName)
-	set(deleteName ${targetName}-libexec-delete)
+function(DeleteUselessDirectories targetName dirNames)
+	set(deletesName ${targetName}-dir-deletes)
+	add_custom_target(${deletesName} ALL)
+	add_dependencies(${targetName} ${deletesName})
+	add_dependencies(${deletesName} ${targetName}-binaries)
 
-	set(deletePath "${CMAKE_INSTALL_PREFIX}/libexec")
+	foreach(dirName ${dirNames})
+		set(deleteName "${targetName}-${dirName}-delete")
 
-	add_custom_target(${deleteName}
-		ALL
-		COMMAND rm -Rf "${deletePath}"
-		DEPENDS ${targetName}-binaries
-	)
+		set(deletePath "${CMAKE_INSTALL_PREFIX}/${dirName}")
 
-	add_dependencies(${targetName} ${deleteName})
-	add_dependencies(${deleteName} ${targetName}-binaries)
+		add_custom_target(${deleteName}
+			ALL
+			COMMAND rm -Rf "${deletePath}"
+			DEPENDS ${targetName}-binaries
+		)
+
+		add_dependencies(${deletesName} ${deleteName})
+	endforeach()
 endfunction()
 
 if (CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -586,7 +592,9 @@ if (BUILD_CLANG)
 
 	DeleteUselessLibDirectories(clang "${clangUselessLibDirectoryNames}")
 
-	DeleteUselessLibexecDirectory(clang)
+	set(clangUselessDirectoryNames include;libexec)
+
+	DeleteUselessDirectories(clang "${clangUselessDirectoryNames}")
 endif()
 
 macro(addConfigureEnv NAME VALUE)
