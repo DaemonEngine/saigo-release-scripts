@@ -663,9 +663,11 @@ if (BUILD_BINUTILS)
 	AddBinaryAliases(binutils "${binutilsToolNames}")
 	AddDirectoryAliases(binutils "${binutilsDirectoryToolNames}")
 
-	add_custom_target(binutils-lib64-alias ALL
+	add_custom_target(binutils-lib64-alias
+		ALL
 		COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/x86_64-nacl"
-		&& ln -sfn lib "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/lib64"
+			&& ln -sfn lib "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/lib64"
+		DEPENDS binutils-binaries
 	)
 
 	add_dependencies(binutils-aliases binutils-lib64-alias)
