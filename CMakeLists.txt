@@ -221,11 +221,11 @@ endmacro()
 include(tarballs.cmake)
 
 set(PATCH_BINUTILS
-	git reset --hard origin/main
+	git reset --hard "${REPOSITORY_TAG_BINUTILS}"
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0001-gprof-makefile-fix-building-m-files.patch
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0002-config-sub-enable-riscv64-and-loong64.patch
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0003-libiberty-waitpid-c-only-compile-waitpid-when-have-waitpid.patch
-	&& git rebase --committer-date-is-author-date origin/main
+	&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_BINUTILS}"
 )
 
 macro(AddGitProject NAME DIR URL TAG)
@@ -277,13 +277,13 @@ endmacro()
 AddGitProject("clang"
 	"llvm-project"
 	"https://chromium.googlesource.com/native_client/nacl-llvm-project-v10.git"
-	"main"
+	"9c7f0369cfdd591e580c5ccfc1f00fedee58029f"
 )
 
 AddGitProject("binutils"
 	"binutils"
 	"https://chromium.googlesource.com/native_client/nacl-binutils.git"
-	"main"
+	"f009fc843ba7b9028f394725961bf899a172f45b"
 )
 
 set(REFERENCE_ARCH_NAME x86_64)
