@@ -136,4 +136,6 @@ do
 
 	cmake -B "${build_dir}" "${cmake_args[@]}"
 	cmake --build "${build_dir}"
+
+	find "${build_dir}/prefix" -type d -exec rmdir {} \; 2>/dev/null || true
 done
