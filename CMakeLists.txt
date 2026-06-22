@@ -108,7 +108,7 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 
 	check_compiler_flag("C" "-mllvm --color" COMPILER_CLANG)
 
-	option(USE_LTO "Enable link-time optimization." ON)
+	option(USE_LTO "Enable link-time optimization." OFF)
 
 	if (USE_LTO AND NOT MINGW)
 		if (COMPILER_CLANG)
