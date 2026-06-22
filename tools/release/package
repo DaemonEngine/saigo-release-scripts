@@ -1,0 +1,88 @@
+#! /usr/bin/env bash
+
+# Copyright (c) 2026 Daemon Developers
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+set -e -u -o pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+export repo_dir="$(git rev-parse --show-toplevel)"
+export paks_dir="${repo_dir}/build/packages"
+
+nproc_count="$("${script_dir}/nproc")"
+
+echo "Using up to ${nproc_count} concurrent tasks"
+
+export touch_date="$(date --utc +'%Y-%m-%d 12:00:00')"
+export version_date="$(date --utc '+%Y%m%d')"
+export version_string="21.0-${version_date}${SUFFIX:+-}${SUFFIX:-}"
+
+export XZ_OPTS="${XZ_OPTS:--9e}"
+
+packaging ()
+{
+	local target_name="${1}"
+
+	dir_name="saigocc-${target_name}_${version_string}"
+	pak_name="${dir_name}.tar.xz"
+
+	echo "Packaging ${target_name} as ${pak_name}"
+
+	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	cd "${build_dir}"
+
+	rm -rf "${dir_name}"
+
+	if cp --help >/dev/null 2>&1
+	then
+		cp --reflink=auto -a 'prefix' "${dir_name}"
+	else
+		cp -a 'prefix' "${dir_name}"
+	fi
+
+	find "${dir_name}" -exec touch --date="${touch_date}" {} \;
+
+	mkdir -p "${paks_dir}"
+	tar -C "${build_dir}" -cJf "${paks_dir}/${pak_name}" "${dir_name}"
+
+	touch --date="${touch_date}" "${paks_dir}/${pak_name}"
+}
+
+export -f packaging
+
+valid_target_names=()
+
+for target_name in "${@}"
+do
+	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+
+	if [ ! -d "${build_dir}/prefix" ]
+	then
+		echo "WARN: Missing ${target_name} built prefix" >&2
+		continue
+	fi
+
+	valid_target_names+=("${target_name}")
+done
+
+for target_name in "${valid_target_names[@]}"
+do
+	echo "${target_name}"
+done | xargs -I{} -P"${nproc_count}" bash -c 'packaging {}'
