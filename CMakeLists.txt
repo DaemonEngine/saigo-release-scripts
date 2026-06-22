@@ -117,8 +117,10 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 			set(FLTO_VALUE "auto")
 		endif()
 
+		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=${FLTO_VALUE} -fno-fat-lto-objects")
+
 		# FreeBSD and macOS clang don't support -fno-fat-lto-objects.
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=${FLTO_VALUE} -fno-fat-lto-objects -Wno-ignored-optimization-argument")
+		set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wno-ignored-optimization-argument")
 
 		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
