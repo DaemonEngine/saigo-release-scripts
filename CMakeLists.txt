@@ -430,6 +430,7 @@ function(DeleteUselessBinaries targetName toolNames)
 				"${deletePath}"
 				"${deletePath}${CMAKE_EXECUTABLE_SUFFIX}"
 				"${deletePath}.bat"
+			DEPENDS ${targetName}-binaries
 		)
 
 		add_dependencies(${deletesName} ${deleteName})
@@ -464,6 +465,7 @@ function(DeleteUselessLibraries targetName libNames)
 				"${sharedDeletePath}${libVersionSuffix}"
 				"${sharedDeletePath}${libVersionLongSuffix}"
 				"${importDeletePath}"
+			DEPENDS ${targetName}-binaries
 		)
 
 		add_dependencies(${deletesName} ${deleteName})
@@ -484,6 +486,7 @@ function(DeleteUselessLibDirectories targetName dirNames)
 		add_custom_target(${deleteName}
 			ALL
 			COMMAND rm -Rf "${deletePath}"
+			DEPENDS ${targetName}-binaries
 		)
 
 		add_dependencies(${deletesName} ${deleteName})
@@ -498,6 +501,7 @@ function(DeleteUselessLibexecDirectory targetName)
 	add_custom_target(${deleteName}
 		ALL
 		COMMAND rm -Rf "${deletePath}"
+		DEPENDS ${targetName}-binaries
 	)
 
 	add_dependencies(${targetName} ${deleteName})
