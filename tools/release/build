@@ -35,14 +35,25 @@ echo "Using ${safer_count} jobs"
 export CMAKE_BUILD_PARALLEL_LEVEL="${safer_count}"
 export MAKEFLAGS="-j${safer_count}"
 
+if [ -z "${USE_CCACHE:-}" ]
+then
+	if command -v ccache >/dev/null 2>&1
+	then
+		USE_CCACHE='ON'
+	fi
+fi
+
 for target_name in "${@}"
 do
 	conf_file="${script_dir}/conf/${target_name}.conf"
+
 	if [ ! -f "${conf_file}" ]
 	then
-		echo "WARN: missing ${target_name} configuration" >&2
+		echo "WARN: Missing ${target_name} configuration" >&2
 		continue
 	fi
+
+	echo "Building ${target_name}"
 
 	cmake_args=(-S "${repo_dir}" -G'Unix Makefiles')
 
@@ -74,14 +85,6 @@ do
 	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
 
 	. "${conf_file}"
-
-	if [ -z "${USE_CCACHE:-}" ]
-	then
-		if command -v ccache >/dev/null 2>&1
-		then
-			USE_CCACHE='ON'
-		fi
-	fi
 
 	if [ -n "${USE_CCACHE:-}" ]
 	then
@@ -127,6 +130,7 @@ do
 		cmake_args+=(-D'CMAKE_OSX_DEPLOYMENT_TARGET'="${MACOS}")
 	fi
 
+	# Variables from target configuration.
 	unset TOOLCHAIN
 	unset GCC
 	unset CLANG
