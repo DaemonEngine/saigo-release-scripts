@@ -592,7 +592,7 @@ if (BUILD_CLANG)
 
 	DeleteUselessLibDirectories(clang "${clangUselessLibDirectoryNames}")
 
-	set(clangUselessDirectoryNames include;libexec)
+	set(clangUselessDirectoryNames include;libexec;share)
 
 	DeleteUselessDirectories(clang "${clangUselessDirectoryNames}")
 endif()
