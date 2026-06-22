@@ -136,6 +136,9 @@ do
 	unset CLANG
 	unset MACOS
 
+	# Variable to only set once
+	unset FORCE_PULL
+
 	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
 
 	cmake -B "${build_dir}" "${cmake_args[@]}"
