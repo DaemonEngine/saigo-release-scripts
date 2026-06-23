@@ -327,7 +327,9 @@ function(RenameBinaryAliases targetName toolNames)
 
 	add_custom_target(${referenceName}
 		ALL
-		COMMAND cp -P "${targetPath}" "${referencePath}"
+		COMMAND 
+			rm -f "${referencePath}"
+			&& cp -P "${targetPath}" "${referencePath}"
 		DEPENDS ${targetName}-binaries
 	)
 
@@ -340,7 +342,9 @@ function(RenameBinaryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}
 			ALL
-			COMMAND cp -P "${referencePath}" "${aliasPath}"
+			COMMAND
+				rm -f "${aliasPath}"
+				&& cp -P "${referencePath}" "${aliasPath}"
 			DEPENDS ${referenceName}
 		)
 
@@ -363,7 +367,9 @@ function(AddBinaryAliases targetName toolNames)
 
 			add_custom_target(${aliasName}
 				ALL
-				COMMAND ln -sf "${referenceName}" "${aliasPath}"
+				COMMAND
+					rm -f "${aliasPath}"
+					&& ln -s "${referenceName}" "${aliasPath}"
 				DEPENDS ${targetName}-binaries
 			)
 
@@ -395,7 +401,9 @@ function(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}-bin-directory
 			ALL
-			COMMAND ln -sfn "../${referenceName}/bin" "${aliasPath}/bin"
+			COMMAND
+				rm -Rf "${aliasPath}/bin"
+				&& ln -s "../${referenceName}/bin" "${aliasPath}/bin"
 			DEPENDS ${aliasName}-directory
 		)
 
@@ -411,7 +419,9 @@ function(AddDirectoryAliases targetName toolNames)
 
 		add_custom_target(${aliasName}-ldscripts-directory
 			ALL
-			COMMAND ln -sfn "../../${referenceName}/lib/ldscripts" "${aliasPath}/lib/ldscripts"
+			COMMAND
+				rm -Rf "${aliasPath}/lib/ldscripts"
+				&& ln -s "../../${referenceName}/lib/ldscripts" "${aliasPath}/lib/ldscripts"
 			DEPENDS ${aliasName}-lib-directory
 		)
 
@@ -421,18 +431,11 @@ function(AddDirectoryAliases targetName toolNames)
 	foreach(toolName ${toolNames})
 		set(toolPath "${CMAKE_INSTALL_PREFIX}/${referenceName}/bin/${toolName}")
 
-		add_custom_target(${targetName}-${toolName}-delete
-			ALL
-			COMMAND rm -f "${toolPath}"
-			DEPENDS ${targetName}-binaries
-		)
-
-		add_dependencies(${aliasesName} ${targetName}-${toolName}-delete)
-
 		add_custom_target(${targetName}-${toolName}-alias
 			ALL
-			COMMAND ln -sf "../../bin/${referenceName}-${toolName}" "${toolPath}"
-			DEPENDS ${targetName}-${toolName}-delete
+			COMMAND
+				rm -f "${toolPath}"
+				&& ln -s "../../bin/${referenceName}-${toolName}" "${toolPath}"
 		)
 
 		add_dependencies(${aliasesName} ${targetName}-${toolName}-alias)
