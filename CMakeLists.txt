@@ -205,8 +205,9 @@ macro(AddTarProject NAME SUBDIR URL)
 			${EP_OPTIONS_${SLUG}}
 			CONFIGURE_COMMAND echo
 			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
-			INSTALL_COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}"
-			INSTALL_COMMAND && rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}/."
+			INSTALL_COMMAND
+				mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}"
+				&& rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}/."
 			DOWNLOAD_EXTRACT_TIMESTAMP ON
 		)
 
@@ -454,10 +455,11 @@ function(DeleteUselessBinaries targetName toolNames)
 
 		add_custom_target(${deleteName}
 			ALL
-			COMMAND rm -f
-				"${deletePath}"
-				"${deletePath}${CMAKE_EXECUTABLE_SUFFIX}"
-				"${deletePath}.bat"
+			COMMAND
+				rm -f
+					"${deletePath}"
+					"${deletePath}${CMAKE_EXECUTABLE_SUFFIX}"
+					"${deletePath}.bat"
 			DEPENDS ${targetName}-binaries
 		)
 
@@ -488,11 +490,12 @@ function(DeleteUselessLibraries targetName libNames)
 
 		add_custom_target(${deleteName}
 			ALL
-			COMMAND rm -f
-				"${sharedDeletePath}"
-				"${sharedDeletePath}${libVersionSuffix}"
-				"${sharedDeletePath}${libVersionLongSuffix}"
-				"${importDeletePath}"
+			COMMAND
+				rm -f
+					"${sharedDeletePath}"
+					"${sharedDeletePath}${libVersionSuffix}"
+					"${sharedDeletePath}${libVersionLongSuffix}"
+					"${importDeletePath}"
 			DEPENDS ${targetName}-binaries
 		)
 
@@ -568,38 +571,39 @@ if (BUILD_CLANG)
 		SOURCE_SUBDIR llvm
 		LIST_SEPARATOR |
 		CMAKE_GENERATOR "${EP_GENERATOR}"
-		CMAKE_ARGS "${EP_CMAKE_ARGS}"
-		CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-		CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
-		CMAKE_ARGS "-DCMAKE_INSTALL_RPATH=${INSTALL_RPATH}"
-		CMAKE_ARGS "-DCMAKE_C_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
-		CMAKE_ARGS "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-		CMAKE_ARGS "-DCMAKE_C_FLAGS=${EP_C_FLAGS}"
-		CMAKE_ARGS "-DCMAKE_CXX_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
-		CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-		CMAKE_ARGS "-DCMAKE_CXX_FLAGS=${EP_CXX_FLAGS}"
-		CMAKE_ARGS "-DCMAKE_EXE_LINKER_FLAGS=${EP_EXE_LINKER_FLAGS}"
-		CMAKE_ARGS -DLLVM_APPEND_VC_REV=ON
-		CMAKE_ARGS -DLLVM_BUILD_LLVM_DYLIB=OFF
-		CMAKE_ARGS -DLLVM_BUILD_TESTS=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_PROJECTS=clang
-		CMAKE_ARGS -DLLVM_ENABLE_LIBCXX=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_LIBXML2=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_Z3_SOLVER=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_ZLIB=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_ZSTD=OFF
-		CMAKE_ARGS -DLLVM_ENABLE_RUNTIMES=
-		CMAKE_ARGS -DLLVM_ENABLE_ASSERTIONS=OFF
-		CMAKE_ARGS -DLLVM_USE_SYMLINKS=ON
-		CMAKE_ARGS "-DLLVM_TARGETS_TO_BUILD=X86|ARM"
-		CMAKE_ARGS "-DLLVM_DEFAULT_TARGET_TRIPLE=${TRIPLE_TARGET}"
-		CMAKE_ARGS "-DLLVM_HOST_TRIPLE=${TRIPLE_HOST}"
-		CMAKE_ARGS -DLLVM_INSTALL_UTILS=OFF
-		CMAKE_ARGS -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
-		CMAKE_ARGS -DLLVM_LINK_LLVM_DYLIB=OFF
-		CMAKE_ARGS -DCLANG_LINK_CLANG_DYLIB=OFF
-		CMAKE_ARGS -DCLANG_INCLUDE_DOCS=OFF
-		CMAKE_ARGS -DCLANG_INCLUDE_TESTS=OFF
+		CMAKE_ARGS
+			"${EP_CMAKE_ARGS}"
+			"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+			"-DCMAKE_INSTALL_RPATH=${INSTALL_RPATH}"
+			"-DCMAKE_C_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
+			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+			"-DCMAKE_C_FLAGS=${EP_C_FLAGS}"
+			"-DCMAKE_CXX_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
+			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+			"-DCMAKE_CXX_FLAGS=${EP_CXX_FLAGS}"
+			"-DCMAKE_EXE_LINKER_FLAGS=${EP_EXE_LINKER_FLAGS}"
+			-DLLVM_APPEND_VC_REV=ON
+			-DLLVM_BUILD_LLVM_DYLIB=OFF
+			-DLLVM_BUILD_TESTS=OFF
+			-DLLVM_ENABLE_PROJECTS=clang
+			-DLLVM_ENABLE_LIBCXX=OFF
+			-DLLVM_ENABLE_LIBXML2=OFF
+			-DLLVM_ENABLE_Z3_SOLVER=OFF
+			-DLLVM_ENABLE_ZLIB=OFF
+			-DLLVM_ENABLE_ZSTD=OFF
+			-DLLVM_ENABLE_RUNTIMES=
+			-DLLVM_ENABLE_ASSERTIONS=OFF
+			-DLLVM_USE_SYMLINKS=ON
+			"-DLLVM_TARGETS_TO_BUILD=X86|ARM"
+			"-DLLVM_DEFAULT_TARGET_TRIPLE=${TRIPLE_TARGET}"
+			"-DLLVM_HOST_TRIPLE=${TRIPLE_HOST}"
+			-DLLVM_INSTALL_UTILS=OFF
+			-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
+			-DLLVM_LINK_LLVM_DYLIB=OFF
+			-DCLANG_LINK_CLANG_DYLIB=OFF
+			-DCLANG_INCLUDE_DOCS=OFF
+			-DCLANG_INCLUDE_TESTS=OFF
 		INSTALL_COMMAND ${CMAKE_COMMAND} --install . --strip
 	)
 
@@ -662,27 +666,30 @@ if (BUILD_BINUTILS)
 
 	ExternalProject_Add(binutils-binaries
 		${EP_OPTIONS_BINUTILS}
-		CONFIGURE_COMMAND "${SOURCE_DIR_BINUTILS}/configure"
-		CONFIGURE_COMMAND ${CONFIGURE_ENV}
-		CONFIGURE_COMMAND "CFLAGS=${EP_C_FLAGS} -Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security"
-		CONFIGURE_COMMAND "LDFLAGS=${EP_EXE_LINKER_FLAGS} ${STATIC_LIBGCC}"
-		CONFIGURE_COMMAND "--build=${TRIPLE_BUILD}"
-		CONFIGURE_COMMAND "--host=${TRIPLE_HOST}"
-		CONFIGURE_COMMAND "--target=${TRIPLE_TARGET}"
-		CONFIGURE_COMMAND "--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
-		CONFIGURE_COMMAND --prefix=
-		# CONFIGURE_COMMAND --enable-gold --enable-plugins --disable-shared
-		CONFIGURE_COMMAND --disable-gold
-		CONFIGURE_COMMAND --disable-werror
-		CONFIGURE_COMMAND --without-zlib
-		CONFIGURE_COMMAND --disable-silent-rules
-		CONFIGURE_COMMAND --enable-deterministic-archives
-		BUILD_COMMAND $(MAKE)
-		BUILD_COMMAND ${CONFIGURE_ENV}
-		INSTALL_COMMAND $(MAKE)
-		INSTALL_COMMAND ${CONFIGURE_ENV}
-		INSTALL_COMMAND "DESTDIR=${CMAKE_INSTALL_PREFIX}"
-		INSTALL_COMMAND install-strip
+		CONFIGURE_COMMAND
+			"${SOURCE_DIR_BINUTILS}/configure"
+				${CONFIGURE_ENV}
+				"CFLAGS=${EP_C_FLAGS} -Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security"
+				"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${STATIC_LIBGCC}"
+				"--build=${TRIPLE_BUILD}"
+				"--host=${TRIPLE_HOST}"
+				"--target=${TRIPLE_TARGET}"
+				"--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
+				--prefix=
+			# 	--enable-gold --enable-plugins --disable-shared
+				--disable-gold
+				--disable-werror
+				--without-zlib
+				--disable-silent-rules
+				--enable-deterministic-archives
+		BUILD_COMMAND
+			$(MAKE)
+				${CONFIGURE_ENV}
+		INSTALL_COMMAND
+			$(MAKE)
+				${CONFIGURE_ENV}
+				"DESTDIR=${CMAKE_INSTALL_PREFIX}"
+				install-strip
 	)
 
 	set(binutilsToolNames addr2line;ar;as;c++filt;elfedit;gprof;nm;objcopy;objdump;ranlib;readelf;size;strings;strip;ld;ld.bfd)
@@ -693,7 +700,8 @@ if (BUILD_BINUTILS)
 
 	add_custom_target(binutils-lib64-alias
 		ALL
-		COMMAND mkdir -p "${CMAKE_INSTALL_PREFIX}/x86_64-nacl"
+		COMMAND
+			mkdir -p "${CMAKE_INSTALL_PREFIX}/x86_64-nacl"
 			&& ln -sfn lib "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/lib64"
 		DEPENDS binutils-binaries
 	)
