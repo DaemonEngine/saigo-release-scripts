@@ -60,7 +60,20 @@ packaging ()
 	find "${dir_name}" -exec touch --date="${touch_date}" {} \;
 
 	mkdir -p "${paks_dir}"
-	tar -C "${build_dir}" -cJf "${paks_dir}/${pak_name}" "${dir_name}"
+
+	local pak_path="${paks_dir}/${pak_name}"
+
+	local tar_args=()
+
+	case "${target_name}" in
+		windows-*)
+			tar_args+=('--dereference')
+		;;
+	esac
+
+	rm -f "${pak_path}"
+
+	tar -C "${build_dir}" "${tar_args[@]}" -cJf "${pak_path}" "${dir_name}"
 
 	touch --date="${touch_date}" "${paks_dir}/${pak_name}"
 }
