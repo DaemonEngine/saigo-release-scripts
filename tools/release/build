@@ -22,13 +22,13 @@
 
 set -e -u -o pipefail
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-repo_dir="$(git rev-parse --show-toplevel)"
+export script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+export repo_dir="$(git rev-parse --show-toplevel)"
 
 # Some LLVM linking tasks may eat up 8GB each.
-nproc_count="$("${script_dir}/nproc")"
-mem_count="$(echo "$(${script_dir}/freemem) 8" | awk '{r = int($1 / $2); print (r < 1 ? 1 : r)}')"
-safer_count="$(echo "${nproc_count} ${mem_count}" | awk '{print ($1 < $2 ? $1 : $2)}')"
+export nproc_count="$("${script_dir}/nproc")"
+export mem_count="$(echo "$(${script_dir}/freemem) 8" | awk '{r = int($1 / $2); print (r < 1 ? 1 : r)}')"
+export safer_count="$(echo "${nproc_count} ${mem_count}" | awk '{print ($1 < $2 ? $1 : $2)}')"
 
 echo "Using ${safer_count} jobs"
 
@@ -43,15 +43,22 @@ then
 	fi
 fi
 
+export USE_CCACHE="${USE_CCACHE:-}"
+
 if [ "${USE_CCACHE}" = 'ON' ]
 then
 	echo "Using Ccache"
 fi
 
+export USE_LTO="${USE_LTO:-}"
+
 if [ "${USE_LTO}" = 'ON' ]
 then
 	echo "Using LTO"
 fi
+
+export CMAKE_DEBUG="${CMAKE_DEBUG:-}"
+export CMAKE_TRACE="${CMAKE_TRACE:-}"
 
 for target_name in "${@}"
 do
@@ -67,34 +74,33 @@ do
 
 	cmake_args=(-S "${repo_dir}" -G'Unix Makefiles')
 
-	if [ "${CMAKE_DEBUG:-}" = 'ON' ]
+	if [ "${CMAKE_DEBUG}" = 'ON' ]
 	then
 		cmake_args+=(--debug-output)
 	fi
 
-	if [ "${CMAKE_TRACE:-}" = 'ON' ]
+	if [ "${CMAKE_TRACE}" = 'ON' ]
 	then
 		cmake_args+=(--trace)
 	fi
 
 	shared_dir="${repo_dir}/build/shared"
 
-	FORCE_PULL="${FORCE_PULL:-OFF}"
-
 	if [ ! -d "${shared_dir}" ]
 	then
 		FORCE_PULL='ON'
 	fi
 	
-	if [ "${FORCE_PULL}" = 'ON' ]
+	if [ "${FORCE_PULL:-}" = 'ON' ]
 	then
 		cmake -B "${shared_dir}" "${cmake_args[@]}" -D'CLONE_SHARED_REPOSITORIES'='ON'
 		cmake --build "${shared_dir}"
 	fi
 
-	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
+	# Variable to only set once.
+	unset FORCE_PULL
 
-	. "${conf_file}"
+	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
 
 	if [ -n "${USE_CCACHE:-}" ]
 	then
@@ -105,6 +111,8 @@ do
 	then
 		cmake_args+=(-D'USE_LTO'="${USE_LTO}")
 	fi
+
+	. "${conf_file}"
 
 	if [ -n "${TOOLCHAIN:-}" ]
 	then
@@ -135,9 +143,6 @@ do
 	unset GCC
 	unset CLANG
 	unset MACOS
-
-	# Variable to only set once.
-	unset FORCE_PULL
 
 	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
 
