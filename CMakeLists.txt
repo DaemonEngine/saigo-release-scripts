@@ -716,6 +716,7 @@ if (BUILD_BINUTILS)
 endif()
 
 add_custom_target(distclean
-    COMMAND ${CMAKE_COMMAND} --build . --target clean
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/prefix"
+    COMMAND
+		${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/prefix"
+		&& ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}" --target clean
 )
