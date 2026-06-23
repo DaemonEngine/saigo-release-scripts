@@ -27,7 +27,7 @@ export repo_dir="$(git rev-parse --show-toplevel)"
 
 export nproc_count="$("${script_dir}/nproc")"
 
-echo "Using up to ${nproc_count} concurrent tasks"
+echo "Using ${nproc_count} jobs"
 
 export SUFFIX="${SUFFIX:-}"
 

@@ -28,7 +28,7 @@ export paks_dir="${repo_dir}/build/packages"
 
 nproc_count="$("${script_dir}/nproc")"
 
-echo "Using up to ${nproc_count} concurrent tasks"
+echo "Using ${nproc_count} jobs"
 
 export SUFFIX="${SUFFIX:-}"
 
@@ -71,7 +71,7 @@ smart_copy ()
 
 export -f smart_copy
 
-packaging ()
+package_target ()
 {
 	local target_name="${1}"
 
@@ -109,7 +109,7 @@ packaging ()
 	touch --date="${touch_date}" "${paks_dir}/${pak_name}"
 }
 
-export -f packaging
+export -f package_target
 
 valid_target_names=()
 
@@ -129,4 +129,4 @@ done
 for target_name in "${valid_target_names[@]}"
 do
 	echo "${target_name}"
-done | xargs -I{} -P"${nproc_count}" bash -c 'packaging {}'
+done | xargs -I{} -P"${nproc_count}" bash -c 'package_target {}'
