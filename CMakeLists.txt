@@ -171,7 +171,7 @@ macro(AddTarProject NAME SUBDIR URL)
 		option(CLONE_${SLUG} "Clone the ${NAME}." ON)
 
 		if (CLONE_${SLUG})
-			ExternalProject_Add("${NAME}-directory"
+			ExternalProject_Add("saigolibs-${NAME}-directory"
 				URL "${URL}"
 				SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
 				CONFIGURE_COMMAND echo
@@ -201,7 +201,7 @@ macro(AddTarProject NAME SUBDIR URL)
 	endif()
 
 	if (BUILD_SAIGOLIBS AND BUILD_${SLUG})
-		ExternalProject_Add("${NAME}-binaries"
+		ExternalProject_Add("saigolibs-${NAME}-binaries"
 			${EP_OPTIONS_${SLUG}}
 			CONFIGURE_COMMAND echo
 			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
@@ -210,7 +210,7 @@ macro(AddTarProject NAME SUBDIR URL)
 			DOWNLOAD_EXTRACT_TIMESTAMP ON
 		)
 
-		add_dependencies(saigolibs ${NAME}-binaries)
+		add_dependencies(saigolibs saigolibs-${NAME}-binaries)
 	endif()
 endmacro()
 
