@@ -216,6 +216,35 @@ endmacro()
 
 include(tarballs.cmake)
 
+if (BUILD_SAIGOLIBS)
+	# x86_64-nacl/include and arm-nacl/include are exactly the same
+	# but exactly one header more in x86_64-nacl/include:
+	#   dynamic_annotations.h
+	# x86_64-nacl/share and arm-nacl/share are exactly the same
+
+	add_custom_target(saigolibs-arm-core-alias
+		ALL
+		COMMAND
+			rm -Rf "${CMAKE_INSTALL_PREFIX}/arm-nacl/include"
+			&& ln -s "../x86_64-nacl/include" "${CMAKE_INSTALL_PREFIX}/arm-nacl/include"
+		DEPENDS saigolibs-x86_64-core-binaries saigolibs-arm-core-binaries
+			saigolibs-x86_64-libcxx-binaries saigolibs-arm-libcxx-binaries
+	)
+
+	add_custom_target(saigolibs-arm-libcxx-alias
+		ALL
+		COMMAND
+			rm -Rf "${CMAKE_INSTALL_PREFIX}/arm-nacl/share"
+			&& ln -s "../x86_64-nacl/share" "${CMAKE_INSTALL_PREFIX}/arm-nacl/share"
+		DEPENDS saigolibs-x86_64-libcxx-binaries saigolibs-arm-libcxx-binaries
+	)
+
+	add_custom_target(saigolibs-aliases)
+	add_dependencies(saigolibs saigolibs-aliases)
+	add_dependencies(saigolibs-aliases saigolibs-arm-core-alias)
+	add_dependencies(saigolibs-aliases saigolibs-arm-libcxx-alias)
+endif()
+
 set(PATCH_BINUTILS
 	git reset --hard "${REPOSITORY_TAG_BINUTILS}"
 	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0001-gprof-makefile-fix-building-m-files.patch
