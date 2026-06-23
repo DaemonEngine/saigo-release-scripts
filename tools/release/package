@@ -30,6 +30,8 @@ nproc_count="$("${script_dir}/nproc")"
 
 echo "Using up to ${nproc_count} concurrent tasks"
 
+export SUFFIX="${SUFFIX:-}"
+
 export touch_date="$(date --utc +'%Y-%m-%d 12:00:00')"
 export version_date="$(date --utc '+%Y%m%d')"
 export version_string="21.0-${version_date}${SUFFIX:+-}${SUFFIX:-}"
