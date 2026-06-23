@@ -24,6 +24,10 @@ project(SaigoNativeClientToolchain LANGUAGES NONE)
 
 include(ExternalProject)
 
+# Some generated files (libraries) will get this strings,
+# we don't control it, but we need to know it before hand.
+set(SAIGO_CLANG_VERSION "21")
+
 if (NOT CLONE_SHARED_REPOSITORIES)
 	enable_language(C)
 	enable_language(CXX)
@@ -476,8 +480,8 @@ function(DeleteUselessLibraries targetName libNames)
 	foreach(libName ${libNames})
 		set(deleteName "${targetName}-lib-${libName}-delete")
 
-		set(libVersionSuffix ".21.0git")
-		set(libVersionLongSuffix ".21.0.0git")
+		set(libVersionSuffix ".${SAIGO_CLANG_VERSION}.0git")
+		set(libVersionLongSuffix ".${SAIGO_CLANG_VERSION}.0.0git")
 
 		if (WIN32)
 			set(sharedLibDir "bin")
