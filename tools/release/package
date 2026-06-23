@@ -36,6 +36,39 @@ export version_string="21.0-${version_date}${SUFFIX:+-}${SUFFIX:-}"
 
 export XZ_OPTS="${XZ_OPTS:--9e}"
 
+if command -v jdupes >/dev/null 2>&1
+then
+	echo 'Using jdupes for deduplication'
+elif command -v rdfind >/dev/null 2>&1
+then
+	echo 'Using rdfind for deduplication'
+else
+	echo 'WARN: missing jdupes or rdfind, will not deduplicate' >&2
+fi
+
+dedupe_dir ()
+{
+	if command -v jdupes >/dev/null 2>&1
+	then
+		jdupes -r -L "${@}"
+	elif command -v rdfind >/dev/null 2>&1
+	then
+		rdfind -makehardlinks true "${@}"
+	fi
+}
+
+export -f dedupe_dir
+
+smart_copy ()
+{
+	if ! cp -a --reflink=auto "${@}" 2>/dev/null
+	then
+		cp -a "${@}"
+	fi
+}
+
+export -f smart_copy
+
 packaging ()
 {
 	local target_name="${1}"
@@ -50,12 +83,16 @@ packaging ()
 
 	rm -rf "${dir_name}"
 
-	if cp --help >/dev/null 2>&1
-	then
-		cp --reflink=auto -a 'prefix' "${dir_name}"
-	else
-		cp -a 'prefix' "${dir_name}"
-	fi
+	case "${target_name}" in
+		windows-*)
+			smart_copy -L 'prefix' "${dir_name}"
+		;;
+		*)
+			smart_copy 'prefix' "${dir_name}"
+		;;
+	esac
+
+	dedupe_dir "${dir_name}" >/dev/null
 
 	find "${dir_name}" -exec touch --date="${touch_date}" {} \;
 
@@ -63,17 +100,9 @@ packaging ()
 
 	local pak_path="${paks_dir}/${pak_name}"
 
-	local tar_args=()
-
-	case "${target_name}" in
-		windows-*)
-			tar_args+=('--dereference')
-		;;
-	esac
-
 	rm -f "${pak_path}"
 
-	tar -C "${build_dir}" "${tar_args[@]}" -cJf "${pak_path}" "${dir_name}"
+	tar -C "${build_dir}" -cJf "${pak_path}" "${dir_name}"
 
 	touch --date="${touch_date}" "${paks_dir}/${pak_name}"
 }
