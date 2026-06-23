@@ -40,12 +40,12 @@ packaging ()
 {
 	local target_name="${1}"
 
-	dir_name="saigocc-${target_name}_${version_string}"
-	pak_name="${dir_name}.tar.xz"
+	local dir_name="saigocc-${target_name}_${version_string}"
+	local pak_name="${dir_name}.tar.xz"
 
 	echo "Packaging ${target_name} as ${pak_name}"
 
-	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	local build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
 	cd "${build_dir}"
 
 	rm -rf "${dir_name}"
