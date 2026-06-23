@@ -714,3 +714,8 @@ if (BUILD_BINUTILS)
 
 	add_dependencies(binutils-aliases binutils-lib64-alias)
 endif()
+
+add_custom_target(distclean
+    COMMAND ${CMAKE_COMMAND} --build . --target clean
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/prefix"
+)
