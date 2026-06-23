@@ -442,6 +442,7 @@ function(AddDirectoryAliases targetName toolNames)
 			COMMAND
 				rm -f "${toolPath}"
 				&& ln -s "${referencePath}" "${toolPath}"
+			DEPENDS ${aliasName}-lib-directory
 		)
 
 		add_dependencies(${aliasesName} ${targetName}-${toolName}-alias)
