@@ -56,10 +56,6 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
 	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
-	find_program(PATH_CCACHE NAMES "ccache")
-	find_program(PATH_NINJA NAMES "ninja")
-	find_program(PATH_MOLD NAMES "mold")
-
 	macro(FindTool SLUG FILE NAME)
 		find_program(PATH_${SLUG} NAMES ${FILE})
 
