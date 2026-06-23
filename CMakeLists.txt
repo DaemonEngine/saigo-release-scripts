@@ -434,13 +434,14 @@ function(AddDirectoryAliases targetName toolNames)
 	endforeach()
 
 	foreach(toolName ${toolNames})
-		set(toolPath "${CMAKE_INSTALL_PREFIX}/${referenceName}/bin/${toolName}")
+		set(toolPath "${CMAKE_INSTALL_PREFIX}/${referenceName}/bin/${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
+		set(referencePath "../../bin/${referenceName}-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
 
 		add_custom_target(${targetName}-${toolName}-alias
 			ALL
 			COMMAND
 				rm -f "${toolPath}"
-				&& ln -s "../../bin/${referenceName}-${toolName}" "${toolPath}"
+				&& ln -s "${referencePath}" "${toolPath}"
 		)
 
 		add_dependencies(${aliasesName} ${targetName}-${toolName}-alias)
