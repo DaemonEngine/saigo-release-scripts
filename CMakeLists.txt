@@ -687,6 +687,10 @@ if (BUILD_BINUTILS)
 
 	if (USE_LTO)
 		set(BINUTILS_C_FLAGS "${BINUTILS_C_FLAGS} ${LTO_FLAGS}")
+
+		if (MINGW)
+			set(BINUTILS_C_FLAGS "${BINUTILS_C_FLAGS} -Dffs=__builtin_ffs")
+		endif()
 	endif()
 
 	ExternalProject_Add(binutils-binaries
