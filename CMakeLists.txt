@@ -704,6 +704,7 @@ if (BUILD_BINUTILS)
 			# 	--enable-gold --enable-plugins --disable-shared
 				--disable-gold
 				--disable-werror
+				--disable-nls
 				--without-zlib
 				--disable-silent-rules
 				--enable-deterministic-archives
