@@ -117,10 +117,10 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 			set(FLTO_VALUE "auto")
 		endif()
 
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -flto=${FLTO_VALUE} -fno-fat-lto-objects")
+		set(LTO_FLAGS "-flto=${FLTO_VALUE} -fno-fat-lto-objects")
 
 		# FreeBSD and macOS clang don't support -fno-fat-lto-objects.
-		set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wno-ignored-optimization-argument")
+		set(LTO_FLAGS "${COMPILER_FLAGS} -Wno-ignored-optimization-argument")
 
 		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
@@ -578,6 +578,12 @@ if (BUILD_CLANG)
 		set(INSTALL_RPATH "@executable_path/../lib")
 	endif()
 
+	if (USE_LTO)
+		set(LLVM_LTO "${FLTO_VALUE}")
+	else()
+		set(LLVM_LTO "OFF")
+	endif()
+
 	ExternalProject_Add(clang-binaries
 		${EP_OPTIONS_CLANG}
 		SOURCE_SUBDIR llvm
@@ -606,6 +612,7 @@ if (BUILD_CLANG)
 			-DLLVM_ENABLE_ZSTD=OFF
 			-DLLVM_ENABLE_RUNTIMES=
 			-DLLVM_ENABLE_ASSERTIONS=OFF
+			"-DLLVM_ENABLE_LTO=${LLVM_LTO}"
 			-DLLVM_USE_SYMLINKS=ON
 			"-DLLVM_TARGETS_TO_BUILD=X86|ARM"
 			"-DLLVM_DEFAULT_TARGET_TRIPLE=${TRIPLE_TARGET}"
@@ -676,12 +683,18 @@ if (BUILD_BINUTILS)
 		set(STATIC_LIBGCC "-static-libstdc++ -static-libgcc")
 	endif()
 
+	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
+
+	if (USE_LTO)
+		set(BINUTILS_C_FLAGS "${BINUTILS_C_FLAGS} ${LTO_FLAGS}")
+	endif()
+
 	ExternalProject_Add(binutils-binaries
 		${EP_OPTIONS_BINUTILS}
 		CONFIGURE_COMMAND
 			"${SOURCE_DIR_BINUTILS}/configure"
 				${CONFIGURE_ENV}
-				"CFLAGS=${EP_C_FLAGS} -Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security"
+				"CFLAGS=${EP_C_FLAGS} ${BINUTILS_C_FLAGS}"
 				"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${STATIC_LIBGCC}"
 				"--build=${TRIPLE_BUILD}"
 				"--host=${TRIPLE_HOST}"
