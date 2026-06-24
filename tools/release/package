@@ -32,8 +32,21 @@ echo "Using ${nproc_count} jobs"
 
 export SUFFIX="${SUFFIX:-}"
 
-export touch_date="$(date --utc +'%Y-%m-%d 12:00:00')"
-export version_date="$(date --utc '+%Y%m%d')"
+print_date ()
+{
+	timestamp="${1}"; shift
+
+	if date --version >/dev/null 2>&1
+	then
+		date -u -d "@${timestamp}" "${@}"
+	else
+		date -u -r "${timestamp}" "${@}"
+	fi
+}
+
+export git_date="$(git log -1 --format='%ct')"
+export touch_date="$(print_date "${git_date}" '+%Y-%m-%d %H:%M:%S')"
+export version_date="$(print_date "${git_date}" '+%Y%m%d')"
 export version_string="21.0-${version_date}${SUFFIX:+-}${SUFFIX:-}"
 
 export XZ_OPTS="${XZ_OPTS:--9e}"
