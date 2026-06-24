@@ -30,7 +30,7 @@ export nproc_count="$("${script_dir}/nproc")"
 
 echo "Using ${nproc_count} jobs"
 
-export SUFFIX="${SUFFIX:-}"
+export NAME_SUFFIX="${VARIANT:+-}${VARIANT:-}"
 
 print_date ()
 {
@@ -47,7 +47,7 @@ print_date ()
 export git_date="$(git log -1 --format='%ct')"
 export touch_date="$(print_date "${git_date}" '+%Y-%m-%d %H:%M:%S')"
 export version_date="$(print_date "${git_date}" '+%Y%m%d')"
-export version_string="21.0-${version_date}${SUFFIX:+-}${SUFFIX:-}"
+export version_string="21.0-${version_date}"
 
 export XZ_OPTS="${XZ_OPTS:--9e}"
 
@@ -88,12 +88,12 @@ package_target ()
 {
 	local target_name="${1}"
 
-	local dir_name="saigocc-${target_name}_${version_string}"
+	local dir_name="saigocc-${target_name}${NAME_SUFFIX}_${version_string}"
 	local pak_name="${dir_name}.tar.xz"
 
 	echo "Packaging ${target_name} as ${pak_name}"
 
-	local build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	local build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 	cd "${build_dir}"
 
 	rm -rf "${dir_name}"
@@ -128,7 +128,7 @@ valid_target_names=()
 
 for target_name in "${@}"
 do
-	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
 	if [ ! -d "${build_dir}/prefix" ]
 	then

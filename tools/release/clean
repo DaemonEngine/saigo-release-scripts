@@ -29,13 +29,13 @@ export nproc_count="$("${script_dir}/nproc")"
 
 echo "Using ${nproc_count} jobs"
 
-export SUFFIX="${SUFFIX:-}"
+export NAME_SUFFIX="${VARIANT:+-}${VARIANT:-}"
 
 clean_target()
 {
 	local target_name="${1}"
 
-	local build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	local build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
 	make -C"${build_dir}" -j"${nproc_count}" distclean
 }
@@ -46,7 +46,7 @@ valid_target_names=()
 
 for target_name in "${@}"
 do
-	build_dir="${repo_dir}/build/${target_name}${SUFFIX:-}"
+	build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX:-}"
 
 	if [ ! -d "${build_dir}" ]
 	then
