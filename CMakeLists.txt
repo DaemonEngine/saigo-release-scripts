@@ -60,19 +60,21 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
 	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
-	macro(FindTool SLUG FILE NAME)
+	macro(FindTool SLUG FILE NAME ENABLEMENT)
 		find_program(PATH_${SLUG} NAMES ${FILE})
 
-		if (PATH_${SLUG})
-			set(FOUND_${SLUG} ON)
+		set(DEFAULT_${SLUG} ${ENABLEMENT})
+
+		if (NOT PATH_${SLUG})
+				set(DEFAULT_${SLUG} OFF)
 		endif()
 
-		option(USE_${SLUG} "Enable ${NAME} when possible." ${FOUND_${SLUG}})
+		option(USE_${SLUG} "Enable ${NAME} when possible." ${DEFAULT_${SLUG}})
 	endmacro()
 
-	FindTool("CCACHE" "ccache" "ccache compiler cache")
-	FindTool("NINJA" "ninja" "ninja builder")
-	FindTool("MOLD" "mold" "mold linker")
+	FindTool("CCACHE" "ccache" "Ccache compiler cache" ON)
+	FindTool("NINJA" "ninja" "Ninja builder" ON)
+	FindTool("MOLD" "mold" "Mold linker" OFF)
 
 	if (USE_CCACHE)
 		# Options come from LLVM CMakeLists.txt file.
