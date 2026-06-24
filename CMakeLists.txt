@@ -258,6 +258,12 @@ set(PATCH_BINUTILS
 	&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_BINUTILS}"
 )
 
+set(PATCH_CLANG
+	git reset --hard "${REPOSITORY_TAG_CLANG}"
+	&& git am ${CMAKE_SOURCE_DIR}/patches/llvm-project/0001-cmake-accept-llvm-enable-lto-auto-option.patch
+	&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_BINUTILS}"
+)
+
 macro(AddGitProject NAME DIR URL TAG)
 	string(TOUPPER "${NAME}" SLUG)
 	set(GIT_REPOSITORY_${SLUG} "${URL}" CACHE STRING "${NAME} git repository location.")

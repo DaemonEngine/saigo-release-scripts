@@ -1,0 +1,37 @@
+From 2115d2c2915d13f474c752e81dea60cc7306b194 Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Wed, 24 Jun 2026 03:10:47 +0200
+Subject: [PATCH] cmake: accept LLVM_ENABLE_LTO=Auto option
+
+---
+ llvm/cmake/modules/HandleLLVMOptions.cmake | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/cmake/modules/HandleLLVMOptions.cmake b/llvm/cmake/modules/HandleLLVMOptions.cmake
+index 9b21190b9fc3..dd6b8117ed4c 100644
+--- a/llvm/cmake/modules/HandleLLVMOptions.cmake
++++ b/llvm/cmake/modules/HandleLLVMOptions.cmake
+@@ -29,7 +29,7 @@ else()
+   set(LINKER_IS_LLD_LINK FALSE)
+ endif()
+ 
+-set(LLVM_ENABLE_LTO OFF CACHE STRING "Build LLVM with LTO. May be specified as Thin or Full to use a particular kind of LTO")
++set(LLVM_ENABLE_LTO OFF CACHE STRING "Build LLVM with LTO. May be specified as Thin, Full or Auto to use a particular kind of LTO")
+ string(TOUPPER "${LLVM_ENABLE_LTO}" uppercase_LLVM_ENABLE_LTO)
+ 
+ option(LLVM_ENABLE_FATLTO "Build LLVM with -ffat-lto-objects." OFF)
+@@ -1281,6 +1281,11 @@ elseif(uppercase_LLVM_ENABLE_LTO STREQUAL "FULL")
+   if(NOT LINKER_IS_LLD_LINK)
+     append("-flto=full" CMAKE_EXE_LINKER_FLAGS CMAKE_SHARED_LINKER_FLAGS)
+   endif()
++elseif(uppercase_LLVM_ENABLE_LTO STREQUAL "AUTO")
++  append("-flto=auto" CMAKE_CXX_FLAGS CMAKE_C_FLAGS)
++  if(NOT LINKER_IS_LLD_LINK)
++    append("-flto=auto" CMAKE_EXE_LINKER_FLAGS CMAKE_SHARED_LINKER_FLAGS)
++  endif()
+ elseif(LLVM_ENABLE_LTO)
+   append("-flto" CMAKE_CXX_FLAGS CMAKE_C_FLAGS)
+   if(NOT LINKER_IS_LLD_LINK)
+-- 
+2.43.0
+
