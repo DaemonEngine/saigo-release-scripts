@@ -712,7 +712,6 @@ if (BUILD_BINUTILS)
 				"--target=${TRIPLE_TARGET}"
 				"--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
 				--prefix=
-			# 	--enable-gold --enable-plugins --disable-shared
 				--disable-gold
 				--disable-werror
 				--disable-nls
