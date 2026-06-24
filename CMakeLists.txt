@@ -110,7 +110,7 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 
 	option(USE_LTO "Enable link-time optimization." OFF)
 
-	if (USE_LTO AND NOT MINGW)
+	if (USE_LTO)
 		if (COMPILER_CLANG)
 			set(FLTO_VALUE "thin")
 		else()
