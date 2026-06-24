@@ -102,12 +102,12 @@ do
 
 	cmake_args+=(-D'SHARED_REPOSITORIES_DIR'="${shared_dir}")
 
-	if [ -n "${USE_CCACHE:-}" ]
+	if [ -n "${USE_CCACHE}" ]
 	then
 		cmake_args+=(-D'USE_CCACHE'="${USE_CCACHE}")
 	fi
 
-	if [ -n "${USE_LTO:-}" ]
+	if [ -n "${USE_LTO}" ]
 	then
 		cmake_args+=(-D'USE_LTO'="${USE_LTO}")
 	fi
