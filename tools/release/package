@@ -76,9 +76,9 @@ export -f dedupe_dir
 
 smart_copy ()
 {
-	if ! cp -a --reflink=auto "${@}" 2>/dev/null
+	if ! cp --reflink=auto -P "${@}" 2>/dev/null
 	then
-		cp -a "${@}"
+		cp -P "${@}"
 	fi
 }
 
@@ -100,10 +100,10 @@ package_target ()
 
 	case "${target_name}" in
 		windows-*)
-			smart_copy -L 'prefix' "${dir_name}"
+			smart_copy -RL 'prefix' "${dir_name}"
 		;;
 		*)
-			smart_copy 'prefix' "${dir_name}"
+			smart_copy -R 'prefix' "${dir_name}"
 		;;
 	esac
 
