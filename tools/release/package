@@ -45,7 +45,7 @@ print_date ()
 }
 
 export git_date="$(git log -1 --format='%ct')"
-export touch_date="$(print_date "${git_date}" '+%Y-%m-%d %H:%M:%S')"
+export touch_date="$(print_date "${git_date}" '+%Y-%m-%dT%H:%M:%S')"
 export version_date="$(print_date "${git_date}" '+%Y%m%d')"
 export version_string="21.0-${version_date}"
 
@@ -109,7 +109,7 @@ package_target ()
 
 	dedupe_dir "${dir_name}" >/dev/null
 
-	find "${dir_name}" -exec touch --date="${touch_date}" {} \;
+	find "${dir_name}" -exec touch -d "${touch_date}" {} \;
 
 	mkdir -p "${paks_dir}"
 
@@ -119,7 +119,7 @@ package_target ()
 
 	tar -C "${build_dir}" -cJf "${pak_path}" "${dir_name}"
 
-	touch --date="${touch_date}" "${paks_dir}/${pak_name}"
+	touch -d "${touch_date}" "${paks_dir}/${pak_name}"
 }
 
 export -f package_target
