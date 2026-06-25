@@ -206,7 +206,7 @@ Beware that building using  LTO is much slower and can require crazy amount of R
 The `build` task makes heavy usage of symbolic links to deduplicates file (see above).
 
 
-## Release multi packaging
+### Release multi packaging
 
 Packaging requires the Release multi build script to be used first.
 
@@ -221,7 +221,7 @@ The `package` task will use `jdupes` or `rdfind` (if present) to deduplicate fil
 All symbolink links are turned into hardlinks in the Windows tarballs to both provide an efficient storage and make sure files are extracted as real files and not as broken links on Windows.
 
 
-## Release multi cleaning
+### Release multi cleaning
 
 This runs the custom `make distclean` action (see above).
 
