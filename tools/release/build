@@ -62,7 +62,7 @@ export CMAKE_TRACE="${CMAKE_TRACE:-}"
 
 export NAME_SUFFIX="${VARIANT:+-}${VARIANT:-}"
 
-for target_name in "${@}"
+for target_name in "${@:-}"
 do
 	conf_file="${script_dir}/conf/${target_name}.conf"
 

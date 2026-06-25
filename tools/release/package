@@ -126,7 +126,7 @@ export -f package_target
 
 valid_target_names=()
 
-for target_name in "${@}"
+for target_name in "${@:-}"
 do
 	build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
