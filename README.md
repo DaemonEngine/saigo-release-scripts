@@ -1,9 +1,15 @@
-# Saigo Native Client Compiler Collection release scripts
+# Saigo Native Client Compiler Collection
+
+[![GitHub tag](https://img.shields.io/github/release/DaemonEngine/saigo-release-scripts.svg)](https://github.com/DaemonEngine/saigo-release-scripts/releases/latest)
+
+[![IRC](https://img.shields.io/badge/irc-%23unvanquished--dev-9cf.svg)](https://unvanquished.net/chat/)
+[![Matrix](https://img.shields.io/badge/matrix-Unvanquished-9cf)](https://matrix.to/#/!WnuetRiQZJNBTKwMrF:matrix.org?via=matrix.org)
+[![Discord](https://img.shields.io/badge/discord-Unvanquished-9cf)](https://discord.gg/usuDT9Pyna)
 
 This project makes possible to rebuild the Native Client compiler collection for usage with the [Dæmon game engine](https://github.com/DaemonEngine/Daemon).
 The Dæmon engine is the open-source game engine powering the [Unvanquished game](https://unvanquished.net).
 
-Saigo is a new toolchain for compiling Native Client applications.
+Saigo is a modern toolchain for compiling Native Client applications.
 
 Google publicly announced [in May of 2017](https://www.tomshardware.com/news/chrome-deprecates-pnacl-embraces-webassembly%2C34583.html) the (then-)upcoming deprecation and abandonment of Native Client technologies in favor of WebAssembly, and announced the actual deprecation [in 2020](https://developer.chrome.com/deprecated).
 But Google also [supported](https://developer.chrome.com/docs/native-client) Native Client-powered ChromeOS 138 until ChromeOS 129 [in July of 2025](https://support.google.com/chrome/a/answer/10314655?&#139) and as such continued developpement of some Native Client technologies.
