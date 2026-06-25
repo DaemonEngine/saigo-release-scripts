@@ -42,7 +42,9 @@ Saigo native binutils|✅️ Rebuilt from scratch
 Saigo nexe libc|☑️ Repackaged
 Saigo nexe libc++|☑️ Repackaged
 
-It is now possible to rebuild the compiler binaries (the NaCl Saigo Clang and related binutils), and to do it for more platforms than initially supported by Google. The compiler binaries have been successfully built for:
+It is now possible to rebuild the compiler binaries (the NaCl Saigo Clang and related binutils), and to do it for more platforms than initially supported by Google.
+
+The compiler binaries have been successfully built for:
 
 Architecture|Linux|Windows|macOS|FreeBSD
 -|-|-|-|-
