@@ -68,7 +68,7 @@ dedupe_dir ()
 		jdupes -r -L "${@}"
 	elif command -v rdfind >/dev/null 2>&1
 	then
-		rdfind -makehardlinks true "${@}"
+		rdfind -makeresultsfile file -makehardlinks true "${@}"
 	fi
 }
 
