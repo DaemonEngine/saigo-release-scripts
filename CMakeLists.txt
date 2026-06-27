@@ -633,6 +633,8 @@ if (BUILD_CLANG)
 		INSTALL_COMMAND ${CMAKE_COMMAND} --install . --strip
 	)
 
+	add_dependencies(clang clang-binaries)
+
 	set(clangToolNames clang;clang++)
 
 	RenameBinaryAliases(clang "${clangToolNames}")
@@ -727,6 +729,8 @@ if (BUILD_BINUTILS)
 				"DESTDIR=${CMAKE_INSTALL_PREFIX}"
 				install-strip
 	)
+
+	add_dependencies(binutils binutils-binaries)
 
 	set(binutilsToolNames addr2line;ar;as;c++filt;elfedit;gprof;nm;objcopy;objdump;ranlib;readelf;size;strings;strip;ld;ld.bfd)
 	set(binutilsDirectoryToolNames ar;as;ld;ld.bfd;nm;objcopy;objdump;ranlib;strip)
