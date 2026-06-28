@@ -685,20 +685,24 @@ addConfigureEnv("CC_FOR_BUILD" "cc")
 addConfigureEnv("MAKEINFO" "true")
 addConfigureEnv("STRIPPROG" "${BINUTIL_STRIP}")
 
+set(STATIC_LIBGCC "-static-libstdc++ -static-libgcc")
+
 if (BUILD_BINUTILS)
 	add_custom_target(binutils ALL)
 
-	if (NOT COMPILER_CLANG)
-		set(STATIC_LIBGCC "-static-libstdc++ -static-libgcc")
-	endif()
-
 	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
 
+	set(BINUTILS_EXE_LINKER_FLAGS)
+
+	if (NOT COMPILER_CLANG)
+		string(APPEND BINUTILS_EXE_LINKER_FLAGS " ${STATIC_LIBGCC}")
+	endif()
+
 	if (USE_LTO)
-		set(BINUTILS_C_FLAGS "${BINUTILS_C_FLAGS} ${LTO_FLAGS}")
+		string(APPEND BINUTILS_C_FLAGS " ${LTO_FLAGS}")
 
 		if (MINGW)
-			set(BINUTILS_C_FLAGS "${BINUTILS_C_FLAGS} -Dffs=__builtin_ffs")
+			string(APPEND BINUTILS_C_FLAGS " -Dffs=__builtin_ffs")
 		endif()
 	endif()
 
@@ -708,7 +712,7 @@ if (BUILD_BINUTILS)
 			"${SOURCE_DIR_BINUTILS}/configure"
 				${CONFIGURE_ENV}
 				"CFLAGS=${EP_C_FLAGS} ${CONFIGURE_COMPILER_FLAGS} ${BINUTILS_C_FLAGS}"
-				"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${STATIC_LIBGCC}"
+				"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${BINUTILS_EXE_LINKER_FLAGS}"
 				"--build=${TRIPLE_BUILD}"
 				"--host=${TRIPLE_HOST}"
 				"--target=${TRIPLE_TARGET}"
