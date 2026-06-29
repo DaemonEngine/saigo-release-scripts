@@ -765,41 +765,6 @@ if (BUILD_BINUTILS)
 	add_dependencies(binutils-aliases binutils-lib64-alias)
 endif()
 
-function(InstallMinGWLibraries)
-	set(mingw_libs "libwinpthread-1.dll" "libstdc++-6.dll")
-
-	if ("${TRIPLE_HOST}" STREQUAL "x86_64-w64-mingw32")
-		list(APPEND mingw_libs "libgcc_s_seh-1.dll")
-	elseif ("${TRIPLE_HOST}" STREQUAL "i686-w64-mingw32")
-		list(APPEND mingw_libs "libgcc_s_dw2-1.dll")
-	endif()
-
-	set(mingw_lib_paths)
-
-	foreach(mingw_lib ${mingw_libs})
-		execute_process(
-			COMMAND
-				"${CMAKE_CXX_COMPILER}" --print-file-name "${mingw_lib}"
-			OUTPUT_VARIABLE mingw_lib_path
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-		)
-		list(APPEND mingw_lib_paths "${mingw_lib_path}")
-	endforeach()
-
-	add_custom_target(clang-mingw-libs
-		ALL
-		COMMAND
-			mkdir -p "${CMAKE_INSTALL_PREFIX}/bin"
-			&& ${CMAKE_COMMAND} -E copy ${mingw_lib_paths} "${CMAKE_INSTALL_PREFIX}/bin/"
-	)
-
-	add_dependencies(clang-binaries clang-mingw-libs)
-endfunction()
-
-if (BUILD_CLANG AND MINGW)
-	InstallMinGWLibraries()
-endif()
-
 add_custom_target(distclean
     COMMAND
 		${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/prefix"
