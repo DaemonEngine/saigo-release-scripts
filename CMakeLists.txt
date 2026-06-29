@@ -677,7 +677,7 @@ if (BUILD_CLANG)
 endif()
 
 macro(addConfigureEnv NAME VALUE)
-	set(CONFIGURE_ENV ${CONFIGURE_ENV} "${NAME}=${VALUE}")
+	list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
 endmacro()
 
 macro(addBinutilEnv NAME PATH)
