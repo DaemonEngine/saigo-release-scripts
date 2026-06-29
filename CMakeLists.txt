@@ -746,6 +746,10 @@ if (BUILD_BINUTILS)
 				--disable-nls
 				--without-zlib
 				--disable-silent-rules
+				--disable-gdb
+				--disable-plugins
+				--disable-sim
+				--disable-testsuite
 				--enable-deterministic-archives
 		BUILD_COMMAND
 			$(MAKE)
