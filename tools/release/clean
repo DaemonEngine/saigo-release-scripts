@@ -37,7 +37,7 @@ clean_target()
 
 	local build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
-	make -C"${build_dir}" -j"${nproc_count}" distclean
+	cmake --build "${build_dir}" --target distclean
 }
 
 export -f clean_target
