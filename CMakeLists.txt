@@ -37,6 +37,8 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	include(CheckCompilerFlag)
 	include(CheckLinkerFlag)
 
+	include(Yokai/Detection)
+
 	set(FLAGS_LIST "${CMAKE_C_FLAGS}")
 	separate_arguments(FLAGS_LIST)
 
@@ -74,9 +76,16 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		option(USE_${SLUG} "Enable ${NAME} when possible." ${DEFAULT_${SLUG}})
 	endmacro()
 
+	# Mold doesn't work properly on FreeBSD.
+	if (YOKAI_HOST_SYSTEM_FREEBSD)
+		set(DEFAULT_MOLD OFF)
+	else()
+		set(DEFAULT_MOLD ON)
+	endif()
+
 	FindTool("CCACHE" "ccache" "Ccache compiler cache" ON)
 	FindTool("NINJA" "ninja" "Ninja builder" ON)
-	FindTool("MOLD" "mold" "Mold linker" OFF)
+	FindTool("MOLD" "mold" "Mold linker" "${DEFAULT_MOLD}")
 
 	if (USE_CCACHE)
 		# Options come from LLVM CMakeLists.txt file.
@@ -105,8 +114,6 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 			set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
 		endif()
 	endif()
-
-	include(Yokai/Detection)
 
 	if (YOKAI_TARGET_SYSTEM_MACOS)
 		if (NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
