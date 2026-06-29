@@ -40,6 +40,7 @@ function(yokai_detect_host_arch)
 	string(TOLOWER "${CMAKE_HOST_SYSTEM_PROCESSOR}" processor_lower)
 
 	foreach(name
+		"amd64"
 		"arm"
 		"arm64"
 		"i686"
@@ -55,6 +56,7 @@ function(yokai_detect_host_arch)
 	if ("${arch_name}" STREQUAL "unknown")
 		set(ARCH_em64t "amd64")
 		set(ARCH_x86_64 "amd64")
+		set(ARCH_armv8l "arm64")
 		set(ARCH_armv7l, "arm")
 		set(ARCH_armv6l, "arm")
 		set(ARCH_aarch64 "arm64")
