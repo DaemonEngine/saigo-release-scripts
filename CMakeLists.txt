@@ -20,6 +20,8 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
 project(SaigoNativeClientToolchain LANGUAGES NONE)
 
 include(ExternalProject)
@@ -104,16 +106,18 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		endif()
 	endif()
 
-	if (CMAKE_OSX_DEPLOYMENT_TARGET)
+	include(Yokai/Detection)
+
+	if (YOKAI_TARGET_SYSTEM_MACOS)
+		if (NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
 		set(COMPILER_FLAGS "${COMPILER_FLAGS} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
 	endif()
-
-	check_compiler_flag("C" "-mllvm --color" COMPILER_CLANG)
+	endif()
 
 	option(USE_LTO "Enable link-time optimization." OFF)
 
 	if (USE_LTO)
-		if (COMPILER_CLANG)
+		if (YOKAI_CXX_COMPILER_CLANG)
 			set(FLTO_VALUE "thin")
 		else()
 			set(FLTO_VALUE "auto")
@@ -128,8 +132,8 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
 	endif()
 
-	if (NOT COMPILER_CLANG)
-		if (MINGW)
+	if (YOKAI_CXX_COMPILER_GCC_COMPATIBILITY AND NOT YOKAI_CXX_COMPILER_CLANG_COMPATIBILITY)
+		if (YOKAI_CXX_COMPILER_MINGW)
 			string(APPEND EXE_LINKER_FLAGS " -static")
 		endif()
 
