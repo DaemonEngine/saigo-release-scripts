@@ -1,0 +1,53 @@
+From 6633028fcea6c508861e757996bc2340949893df Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Wed, 1 Jul 2026 12:07:58 +0200
+Subject: [PATCH] ld/Makefile.in: do not build libldtestplug_la-testplug.lo
+
+---
+ ld/Makefile.in | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index b95a3d103d..87ad8cdbad 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -92,14 +92,6 @@ CONFIG_HEADER = config.h
+ CONFIG_CLEAN_FILES = po/Makefile.in
+ CONFIG_CLEAN_VPATH_FILES =
+ LTLIBRARIES = $(noinst_LTLIBRARIES)
+-libldtestplug_la_LIBADD =
+-@ENABLE_PLUGINS_TRUE@am_libldtestplug_la_OBJECTS =  \
+-@ENABLE_PLUGINS_TRUE@	libldtestplug_la-testplug.lo
+-libldtestplug_la_OBJECTS = $(am_libldtestplug_la_OBJECTS)
+-libldtestplug_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libldtestplug_la_CFLAGS) \
+-	$(CFLAGS) $(libldtestplug_la_LDFLAGS) $(LDFLAGS) -o $@
+-@ENABLE_PLUGINS_TRUE@am_libldtestplug_la_rpath =
+ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(infodir)" \
+ 	"$(DESTDIR)$(man1dir)"
+ PROGRAMS = $(bin_PROGRAMS)
+@@ -1478,7 +1470,6 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ldver.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ldwrite.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lexsup.Po@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libldtestplug_la-testplug.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mri.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pe-dll.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pep-dll.Po@am__quote@
+@@ -1505,13 +1496,6 @@ distclean-compile:
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+ 
+-libldtestplug_la-testplug.lo: testplug.c
+-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libldtestplug_la_CFLAGS) $(CFLAGS) -MT libldtestplug_la-testplug.lo -MD -MP -MF $(DEPDIR)/libldtestplug_la-testplug.Tpo -c -o libldtestplug_la-testplug.lo `test -f 'testplug.c' || echo '$(srcdir)/'`testplug.c
+-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libldtestplug_la-testplug.Tpo $(DEPDIR)/libldtestplug_la-testplug.Plo
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='testplug.c' object='libldtestplug_la-testplug.lo' libtool=yes @AMDEPBACKSLASH@
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libldtestplug_la_CFLAGS) $(CFLAGS) -c -o libldtestplug_la-testplug.lo `test -f 'testplug.c' || echo '$(srcdir)/'`testplug.c
+-
+ .l.c:
+ 	$(am__skiplex) $(SHELL) $(YLWRAP) $< $(LEX_OUTPUT_ROOT).c $@ -- $(LEXCOMPILE)
+ 
+-- 
+2.43.0
+
