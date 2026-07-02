@@ -22,7 +22,7 @@ This repository doesn't contain any Saigo code, it provides scripts to build Sai
 - [chromium.googlesource.com/native_client/nacl-llvm-project-v10](https://chromium.googlesource.com/native_client/nacl-llvm-project-v10) (Saigo clang)
 - [chromium.googlesource.com/native_client/nacl-binutils](https://chromium.googlesource.com/native_client/nacl-binutils) (Saigo binutils)
 
-We provide patches (stored in this repository) that CMake automatically applies on upstream repositories before building the software. Those patches keep the tools buildables and makes them more cross-platform (buildable on more systems and architectures).
+We provide patches (stored in this repository) that CMake automatically applies over upstream repositories before building the software. Those patches keep the tools buildables and makes them more cross-platform (buildable for more systems and architectures).
 
 The related project to rebuild without Google's complex collection of repositories and without shady Google's precompiled binaries and with our own fixes the Native Client loader can be found there:
 
@@ -49,11 +49,11 @@ The compiler binaries have been successfully built for:
 Architecture|Linux|Windows|macOS|FreeBSD
 -|-|-|-|-
 amd64|✅️|✅️|✅️|✅️
-i686|✅️|✅️|
+i686|✅️|✅️||✅️
 arm64|✅️||✅️
 armhf|✅️
 ppc64el|✅️
-riscv4|✅️
+riscv64|✅️
 loong64|✅️
 
 This is only about running the compilers natively to compile NaCl code, the NaCl loader (for running NaCl code) has stricter limitations.
@@ -62,18 +62,18 @@ The Windows build is meant to be cross-compiled on Linux using MinGW.
 
 For now, the libc and libc++ libraries are copied from pre-compiled libraries provided by Google.
 
-Those libraries only contribute to binaries that run inside in the untrested environment of the Native Client virtual machine, meaning no pre-compiled code runs in the trusted environement outside of the Native Client virtual machine.
+Those libraries only contribute to binaries that run inside in the untrusted environment within the Native Client virtual machine, meaning no pre-compiled code runs in the trusted environement outside of the Native Client virtual machine.
 
-This project then already achieved the ability for someone to be able to recompile all the trusted code and then never have to run any precompiled trusted code.
+This project then already achieved the ability for someone to be able to recompile all the trusted code and then don't have to trust any precompiled code.
 
-The toolchain being buildable for some platforms only means it's possible to run the toolchain on those platforms to produce Native Client executables (nexe), it doesn't mean those Native Client executable can run on those platform. Running Native Client executables on new platforms would require new code in both the toolchain and the loader and this is not planned.
+The toolchain being buildable for some platforms only means it's possible to run the toolchain on those platforms to produce Native Client executables (nexe), it doesn't mean those Native Client executable will run on those platforms. Running Native Client executables on new platforms would require new code in both the toolchain and the loader and this is not planned.
 
-On platforms that can run the loader under some compatibility mode (like running 32-bit loader on 64-bit environment, or Linux running [box64](https://box86.org), or macOS running amd64 loader through Rosetta 2 on arm64, or FreeBSD running the Linux loader on Linuxulator, it means it makes possible to have a fully native toolchain to produce NaCl binaries (once the required libc and libc++ are installed too).
+On platforms that can run the loader under some compatibility mode (like running 32-bit loader on 64-bit environment, or Linux running [box64](https://box86.org), or macOS running the amd64 loader through Rosetta 2 on arm64, or FreeBSD running the Linux loader on Linuxulator, it means it makes possible to have a fully native toolchain to produce NaCl binaries on the same platforms.
 
 
 ## Workspace requirements
 
-Those build scripts and CMake configuration are only tested on Unix-like environment, the bash shell and standard coreutils are required.
+Those build scripts and CMake configuration are only tested in Unix-like environment, the bash shell and standard coreutils are required.
 
 
 ## Systems
@@ -88,6 +88,8 @@ Linux|Linux|GCC
 Windows|Linux|MinGW
 FreeBSD|FreeBSD|Clang
 macOS|macOS|AppleClang
+
+The release build script will select the compiler for you: it will uses GCC when building a Linux binary for example, even if Clang is installed.
 
 
 ### Tools
@@ -118,22 +120,27 @@ Release packaging script
 - `tar` (GNU or BSD)
 - `xz`
 - `jdupes` or `rdfind`  
-   Optional, but recommended to deduplicate tarball content.
+   Optional, but recommended to deduplicate tarball content before packaging.
 
 Recommended:
 
-- `ccache`  
-  Can save recompilation time if when you want to restart the build.
-- `ninja`
+- [`ccache`](https://ccache.dev)  
+  Can save recompilation time if when you want to restart the build.  
+  It can be used with [`icecc`](https://github.com/icecc/icecream) to distribute the build if also present.
+- [`ninja`](https://ninja-build.org)  
   May be more efficient than Make, will be used for building LLVM if present.
+- [`mold`](https://github.com/rui314/mold)  
+  May be faster than usual linkers, will be used if present and known to work on the build system.
+
+CMake will automatically use those tools when found in `PATH`.
 
 Even when providing CMake and Ninja, Make will be used for building binutils as binutils build uses autotools and require Make.
 
-CMake will do all the required autotools and make calls automatically.
+CMake will run autotools and make calls automatically for you.
 
-CMake will also clone the clang and binutils repositories using git and automatically apply the patches.
+CMake will also clone the clang and binutils repositories using Git and automatically apply the patches.
 
-CMake will also clean-up at the end of the build process the useless stuff built with LLVM that we could not disable.
+CMake will also clean-up at the end of the build process the useless stuff built with LLVM that we could not disable, to keep the package small.
 
 
 ## Build instructions
@@ -163,8 +170,6 @@ make distclean
 ```
 
 This runs the standard `make clean` action to clean-up build temporary files and reset the build progression, and deletes the `prefix` directory where things have been installed.
-
-Note: Cleaning does not work on FreeBSD because of a bug in autotools.
 
 
 ### Release multi build
@@ -229,7 +234,6 @@ This runs the custom `make distclean` action (see above).
 tools/release/package linux-amd64 linux-arm64 linux-armhf linux-i686 linux-loong64 linux-ppc64el linux-riscv64 macos-amd64 macos-arm64 windows-amd64 windows-i686
 ```
 
-Note: Cleaning does not work on FreeBSD because of a bug in autotools.
 
 ## History
 
@@ -272,11 +276,12 @@ Linux armhf|✅ native|✅️ native
 Linux ppc64el|☑️ compatible (box64)|✅️ native
 Linux riscv64|☑️ compatible (box64)|✅️ native
 Linux loong64|☑️ compatible (box64, untested)|✅️ native
-FreeBSD amd64|☑️ compatible (Linuxulator)|✅️ native
-macOS amd64|✅️ native|✅️ native
-macOS arm64|☑️ compatible (Rosetta 2)|✅️ native
 Windows amd64|✅️ native|✅️ native
 Windows i686|✅️ native|✅️ native
+macOS amd64|✅️ native|✅️ native
+macOS arm64|☑️ compatible (Rosetta 2)|✅️ native
+FreeBSD amd64|☑️ compatible (Linuxulator)|✅️ native
+FreeBSD i686|☑️ compatible (Linuxulator)|✅️ native
 
 For the nexe libc and libc++, this project repackages the Google pre-compiled libraries in order to reach a minimimum viable product state. This precompiled code is meant to be executed within the Native Client sandbox and then doesn't require the same level of trust.
 
@@ -289,7 +294,7 @@ Rebuilding the NaCl loader is possible thanks to this other project:
 
 ## Supported nexe target platforms
 
-Here are the supported NaCl targets:
+The supported NaCl targets are:
 
 - `amd64`
 - `i686`
@@ -304,7 +309,7 @@ It also means precompiled `pexe` static libraries for various common libraries p
 
 ## Limitations
 
-Unlike PNaCl, Saigo may not support exceptions. There are some obvious exception-related files provided there and there, but we didn't got it working. We didn't got exceptions working with Google-built Saigo as well to begin with.
+Unlike PNaCl, Saigo may not support exceptions. There are some obvious exception-related files provided there and there, but we didn't got it working. We didn't got exceptions working with Google-built Saigo as well to begin with, neither some of the very latest PNaCl compilers.
 
 If you know how to make exceptions working, your contributions will be well appreciated.
 
