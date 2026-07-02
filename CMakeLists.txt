@@ -148,12 +148,8 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
 	endif()
 
-	if (YOKAI_CXX_COMPILER_GCC_COMPATIBILITY AND NOT YOKAI_CXX_COMPILER_CLANG_COMPATIBILITY)
-		if (YOKAI_CXX_COMPILER_MINGW)
-			string(APPEND EXE_LINKER_FLAGS " -static")
-		endif()
-
-		string(APPEND EXE_LINKER_FLAGS " -static-libstdc++ -static-libgcc")
+	if (YOKAI_CXX_COMPILER_MINGW)
+		string(APPEND EXE_LINKER_FLAGS " -static -static-libstdc++ -static-libgcc")
 	endif()
 
 	set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
@@ -714,18 +710,12 @@ addConfigureEnv("CC_FOR_BUILD" "cc")
 addConfigureEnv("MAKEINFO" "true")
 addConfigureEnv("STRIPPROG" "${BINUTIL_STRIP}")
 
-set(STATIC_LIBGCC "-static-libstdc++ -static-libgcc")
-
 if (BUILD_BINUTILS)
 	add_custom_target(binutils ALL)
 
 	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
 
 	set(BINUTILS_EXE_LINKER_FLAGS)
-
-	if (NOT COMPILER_CLANG)
-		string(APPEND BINUTILS_EXE_LINKER_FLAGS " ${STATIC_LIBGCC}")
-	endif()
 
 	if (USE_LTO)
 		string(APPEND BINUTILS_C_FLAGS " ${LTO_FLAGS}")
