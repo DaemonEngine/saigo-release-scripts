@@ -290,21 +290,6 @@ if (BUILD_SAIGOLIBS)
 	add_dependencies(saigolibs-aliases saigolibs-arm-libcxx-alias)
 endif()
 
-set(PATCH_BINUTILS
-	git reset --hard "${REPOSITORY_TAG_BINUTILS}"
-	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0001-gprof-makefile-fix-building-m-files.patch
-	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0002-config-sub-enable-riscv64-and-loong64.patch
-	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0003-libiberty-waitpid-c-only-compile-waitpid-when-have-waitpid.patch
-	&& git am ${CMAKE_SOURCE_DIR}/patches/binutils/0004-ld-makefile-in-do-not-build-libldtestplug-la-testplug-lo.patch
-	&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_BINUTILS}"
-)
-
-set(PATCH_CLANG
-	git reset --hard "${REPOSITORY_TAG_CLANG}"
-	&& git am ${CMAKE_SOURCE_DIR}/patches/llvm-project/0001-cmake-accept-llvm-enable-lto-auto-option.patch
-	&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_BINUTILS}"
-)
-
 macro(AddGitProject NAME DIR URL TAG)
 	string(TOUPPER "${NAME}" SLUG)
 	set(GIT_REPOSITORY_${SLUG} "${URL}" CACHE STRING "${NAME} git repository location.")
@@ -317,6 +302,23 @@ macro(AddGitProject NAME DIR URL TAG)
 		option(CLONE_${SLUG} "Clone the ${NAME} repository." ON)
 
 		if (CLONE_${SLUG})
+			set(patch_list "${ARGN}")
+
+			if (patch_list)
+				list(APPEND PATCH_${SLUG}
+					git reset --hard "${REPOSITORY_TAG_${SLUG}}")
+
+				foreach(patch_file IN LISTS patch_list)
+					list(APPEND PATCH_${SLUG}
+						&& git am "${CMAKE_SOURCE_DIR}/patches/${DIR}/${patch_file}")
+				endforeach()
+
+				list(APPEND PATCH_${SLUG}
+					&& git rebase --committer-date-is-author-date "${REPOSITORY_TAG_${SLUG}}")
+			else()
+				set(PATCH_${SLUG} echo)
+			endif()
+
 			ExternalProject_Add("${REPOSITORY_DIR_${SLUG}}-shared-repository"
 				SOURCE_DIR "${DIR}"
 				GIT_REPOSITORY "${GIT_REPOSITORY_${SLUG}}"
@@ -355,12 +357,17 @@ AddGitProject("clang"
 	"llvm-project"
 	"https://chromium.googlesource.com/native_client/nacl-llvm-project-v10.git"
 	"9c7f0369cfdd591e580c5ccfc1f00fedee58029f"
+	"0001-cmake-accept-llvm-enable-lto-auto-option.patch"
 )
 
 AddGitProject("binutils"
 	"binutils"
 	"https://chromium.googlesource.com/native_client/nacl-binutils.git"
 	"f009fc843ba7b9028f394725961bf899a172f45b"
+	"0001-gprof-makefile-fix-building-m-files.patch"
+	"0002-config-sub-enable-riscv64-and-loong64.patch"
+	"0003-libiberty-waitpid-c-only-compile-waitpid-when-have-waitpid.patch"
+	"0004-ld-makefile-in-do-not-build-libldtestplug-la-testplug-lo.patch"
 )
 
 set(REFERENCE_ARCH_NAME x86_64)
