@@ -139,23 +139,28 @@ do
 	valid_target_names+=("${target_name}")
 done
 
-for target_name in "${valid_target_names[@]}"
-do
-	echo "${target_name}"
-done | xargs -I{} -P"${nproc_count}" bash -c 'package_target {}'
+# This extra test workarounds a macOS obsolete bash bug
+# where an empty array is undefined variable.
+if [ -n "${valid_target_names:-}" ]
+then
+	for target_name in "${valid_target_names[@]}"
+	do
+		echo "${target_name}"
+	done | xargs -I{} -P"${nproc_count}" bash -c 'package_target {}'
 
-archive_names=()
+	archive_names=()
 
-for target_name in "${valid_target_names[@]}"
-do
-	dir_name="saigocc-${target_name}${NAME_SUFFIX}_${version_string}"
-	pak_name="${dir_name}.tar.xz"
-	archive_names+=("${pak_name}")
-done
+	for target_name in "${valid_target_names[@]}"
+	do
+		dir_name="saigocc-${target_name}${NAME_SUFFIX}_${version_string}"
+		pak_name="${dir_name}.tar.xz"
+		archive_names+=("${pak_name}")
+	done
 
-sum_name="saigocc${NAME_SUFFIX}_${version_string}.sha512sum"
+	sum_name="saigocc${NAME_SUFFIX}_${version_string}.sha512sum"
 
-cd "${repo_dir}/build/packages"
+	cd "${repo_dir}/build/packages"
 
-sha512sum -b $(ls "${archive_names[@]}" | sort) > "${sum_name}"
-touch -d "${touch_date}" "${sum_name}"
+	sha512sum -b $(ls "${archive_names[@]}" | sort) > "${sum_name}"
+	touch -d "${touch_date}" "${sum_name}"
+fi

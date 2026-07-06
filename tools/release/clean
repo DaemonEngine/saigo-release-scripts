@@ -56,7 +56,12 @@ do
 	valid_target_names+=("${target_name}")
 done
 
-for target_name in "${valid_target_names[@]}"
-do
-	echo "${target_name}"
-done | xargs -I{} -P"${nproc_count}" bash -c 'clean_target {}'
+# This extra test workarounds a macOS obsolete bash bug
+# where and empty array is undefined variable.
+if [ -n "${valid_target_names:-}" ]
+then
+	for target_name in "${valid_target_names[@]}"
+	do
+		echo "${target_name}"
+	done | xargs -I{} -P"${nproc_count}" bash -c 'clean_target {}'
+fi
