@@ -50,6 +50,12 @@ AddGitProject("binutils"
 	"0004-ld-makefile-in-do-not-build-libldtestplug-la-testplug-lo.patch"
 )
 
+AddGitProject("nacl"
+	"native_client"
+	"https://github.com/DaemonEngine/native_client.git"
+	"ae29840014b5c08c7733ee9257741d421723255a"
+)
+
 include(saigolibs-tarballs.cmake)
 
 set(REFERENCE_SYSTEM_NAME "nacl")
@@ -239,6 +245,38 @@ if (BUILD_BINUTILS)
 	)
 
 	add_dependencies(binutils-aliases binutils-lib64-alias)
+endif()
+
+if (BUILD_NACL)
+	option(BUILD_NACL_INCLUDE "Build the nacl include" ON)
+endif()
+
+if (BUILD_NACL AND BUILD_NACL_INCLUDE)
+	set(src_include "${SOURCE_DIR_NACL}/src/include/nacl")
+	set(amd64_include "${CMAKE_INSTALL_PREFIX}/x86_64-nacl/include/nacl")
+	set(arm_include "${CMAKE_INSTALL_PREFIX}/arm-nacl/include/nacl")
+
+	set(include_file_list
+		nacl_exception.h
+		nacl_minidump.h
+		simd.h
+	)
+
+	list(APPEND include_command ${CMAKE_COMMAND} -E make_directory "${amd64_include}")
+
+	foreach(include_file IN LISTS include_file_list)
+		list(APPEND include_command
+			 && ${CMAKE_COMMAND} -E copy_if_different
+				"${src_include}/${include_file}" "${amd64_include}/${include_file}"
+		)
+	endforeach()
+
+	ExternalProject_Add(nacl-include
+		${EP_OPTIONS_NACL}
+		CONFIGURE_COMMAND echo
+		BUILD_COMMAND echo
+		INSTALL_COMMAND ${include_command}
+	)
 endif()
 
 if (BUILD_SAIGOLIBS)
