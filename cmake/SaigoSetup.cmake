@@ -57,15 +57,25 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
 	macro(FindTool SLUG FILE NAME ENABLEMENT)
-		find_program(PATH_${SLUG} NAMES ${FILE})
+		set("DEFAULT_${SLUG}" "${ENABLEMENT}")
 
-		set(DEFAULT_${SLUG} ${ENABLEMENT})
+		find_program(PATH_${SLUG} NAMES "${FILE}")
 
 		if (NOT PATH_${SLUG})
-				set(DEFAULT_${SLUG} OFF)
+			set("DEFAULT_${SLUG}" OFF)
 		endif()
 
-		option(USE_${SLUG} "Enable ${NAME} when possible." ${DEFAULT_${SLUG}})
+		option("USE_${SLUG}" "Enable ${NAME} when possible." "${DEFAULT_${SLUG}}")
+
+		if (PATH_${SLUG})
+			if (USE_${SLUG})
+				message(STATUS "${NAME} available and used")
+			else()
+				message(STATUS "${NAME} available but not used")
+			endif()
+		else()
+			message(STATUS "${NAME} not available")
+		endif()
 	endmacro()
 
 	# Mold doesn't work properly on FreeBSD.
@@ -81,22 +91,18 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	FindTool("MOLD" "mold" "Mold linker" "${DEFAULT_MOLD}")
 
 	if (USE_CCACHE)
-		# Options come from LLVM CMakeLists.txt file.
-		set(ENV${CCACHE_CPP2} "yes")
-		set(ENV${CCACHE_HASHDIR} "yes")
 		set(EP_COMPILER_LAUNCHER "${PATH_CCACHE}")
-		set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
-		set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
+
+		# Options come from the LLVM CMakeLists.txt file:
+		list(APPEND BUILD_ENV "CCACHE_CPP2=true")
+		list(APPEND BUILD_ENV "CCACHE_HASHDIR=true")
 
 		if (USE_ICECC)
-			set(ENV{CCACHE_PREFIX} "${PATH_ICECC}")
+			list(APPEND BUILD_ENV "CCACHE_PREFIX=${PATH_ICECC}")
 		endif()
+
 	elseif (USE_ICECC)
 		set(EP_COMPILER_LAUNCHER "${PATH_ICECC}")
-		set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
-		set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
-		set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
-		set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
 	endif()
 
 	if (USE_NINJA)
@@ -106,12 +112,12 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		set(EP_GENERATOR "${CMAKE_GENERATOR}")
 	endif()
 
-	if (USE_MOLD AND NOT MINGW)
-		set(MOLD_FLAG "-fuse-ld=${PATH_MOLD}")
-		check_linker_flag("C" ${MOLD_FLAG} FUSE_LD_MOLD)
+	if (USE_MOLD)
+		set(MOLD_FLAG "-fuse-ld=mold")
+		check_linker_flag("C" "LINKER:${MOLD_FLAG}" FUSE_LD_MOLD)
 
 		if (FUSE_LD_MOLD)
-			set(COMPILER_FLAGS "${COMPILER_FLAGS} ${MOLD_FLAG}")
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wl,${MOLD_FLAG}")
 			set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
 		endif()
 	endif()
@@ -159,4 +165,14 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		# See: https://llvm.org/docs/HowToCrossCompileLLVM.html
 		list(APPEND EP_CMAKE_ARGS "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 	endif()
+
+	set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
+	set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
+
+	macro(addConfigureEnv NAME VALUE)
+		list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
+	endmacro()
+
+	addConfigureEnv("CC" "${EP_COMPILER_LAUNCHER} ${EP_C_COMPILER}")
+	addConfigureEnv("CXX" "${EP_COMPILER_LAUNCHER} ${EP_CXX_COMPILER}")
 endif()

@@ -62,7 +62,7 @@ macro(AddGitProject NAME DIR URL TAG)
 endmacro()
 
 macro(AddTarProject PARENT_NAME NAME SUBDIR URL)
-	string(TOUPPER "${PARENT_NAME}" "${PARENT_SLUG}")
+	string(TOUPPER "${PARENT_NAME}" PARENT_SLUG)
 	string(TOUPPER "${NAME}" SLUG)
 	set(TARGET_SLUG "${PARENT_SLUG}_${SLUG}")
 	set(TARGET_NAME "${PARENT_NAME}-${NAME}")

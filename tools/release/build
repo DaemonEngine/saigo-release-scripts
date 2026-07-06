@@ -30,11 +30,6 @@ export nproc_count="$("${script_dir}/nproc")"
 export mem_count="$(echo "$(${script_dir}/freemem) 8" | awk '{r = int($1 / $2); print (r < 1 ? 1 : r)}')"
 export safer_count="$(echo "${nproc_count} ${mem_count}" | awk '{print ($1 < $2 ? $1 : $2)}')"
 
-echo "Using ${safer_count} jobs"
-
-export CMAKE_BUILD_PARALLEL_LEVEL="${safer_count}"
-export MAKEFLAGS="-j${safer_count}"
-
 if [ -z "${USE_CCACHE:-}" ]
 then
 	if command -v ccache >/dev/null 2>&1
@@ -50,12 +45,38 @@ then
 	echo "Using Ccache"
 fi
 
+if [ -z "${USE_ICECC:-}" ]
+then
+	if command -v icecc >/dev/null 2>&1
+	then
+		USE_ICECC='ON'
+	fi
+fi
+
+export USE_ICECC="${USE_ICECC:-}"
+
+if [ "${USE_ICECC}" = 'ON' ]
+then
+	echo "Using IceCC"
+fi
+
 export USE_LTO="${USE_LTO:-}"
 
 if [ "${USE_LTO}" = 'ON' ]
 then
 	echo "Using LTO"
 fi
+
+if [ "${USE_ICECC}" = 'ON' ]
+then
+	echo "Using distributed jobs"
+	export safer_count='999'
+else
+	echo "Using ${safer_count} jobs"
+fi
+
+export CMAKE_BUILD_PARALLEL_LEVEL="${safer_count}"
+export MAKEFLAGS="-j${safer_count}"
 
 export CMAKE_DEBUG="${CMAKE_DEBUG:-}"
 export CMAKE_TRACE="${CMAKE_TRACE:-}"
@@ -107,6 +128,11 @@ do
 	if [ -n "${USE_CCACHE}" ]
 	then
 		cmake_args+=(-D'USE_CCACHE'="${USE_CCACHE}")
+	fi
+
+	if [ -n "${USE_ICECC}" ]
+	then
+		cmake_args+=(-D'USE_ICECC'="${USE_ICECC}")
 	fi
 
 	if [ -n "${USE_LTO}" ]
