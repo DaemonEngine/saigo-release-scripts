@@ -290,8 +290,8 @@ if (BUILD_CLANG)
 	AddBinaryAliases(clang "${clangToolNames}")
 
 	set(clangUselessFiles
-		"bin/hmaptool"
 		"bin/clang-cl${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/hmaptool"
 		"lib/cmake/llvm/LLVMConfigExtensions.cmake"
 	)
 
@@ -383,9 +383,9 @@ if (BUILD_BINUTILS)
 	set(binutilsToolNames
 		ar
 		as
+		ld
 		nm
 		ranlib
-		ld
 		strip
 	)
 
@@ -416,29 +416,28 @@ if (BUILD_BINUTILS)
 		"bin/x86_64-nacl-c++filt${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-elfedit${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-gprof${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-objcopy${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-objdump${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-readelf${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-size${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-strings${CMAKE_EXECUTABLE_SUFFIX}"
-		"bin/x86_64-nacl-ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
-		"x86_64-nacl/bin/ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
-		"x86_64-nacl/bin/objcopy${CMAKE_EXECUTABLE_SUFFIX}"
-		"x86_64-nacl/bin/objdump${CMAKE_EXECUTABLE_SUFFIX}"
-		"share/info/standards.info"
-		"share/info/configure.info"
 		"share/info/as.info"
-		"share/info/gprof.info"
 		"share/info/bfd.info"
-		"share/info/ld.info"
 		"share/info/binutils.info"
+		"share/info/configure.info"
 		"share/info/dir"
-		"share/man/man1/x86_64-nacl-as.1"
-		"share/man/man1/x86_64-nacl-gprof.1"
-		"share/man/man1/x86_64-nacl-ld.1"
+		"share/info/gprof.info"
+		"share/info/ld.info"
+		"share/info/standards.info"
 		"share/man/man1/x86_64-nacl-addr2line.1"
 		"share/man/man1/x86_64-nacl-ar.1"
+		"share/man/man1/x86_64-nacl-as.1"
+		"share/man/man1/x86_64-nacl-c++filt.1"
 		"share/man/man1/x86_64-nacl-dlltool.1"
+		"share/man/man1/x86_64-nacl-elfedit.1"
+		"share/man/man1/x86_64-nacl-gprof.1"
+		"share/man/man1/x86_64-nacl-ld.1"
 		"share/man/man1/x86_64-nacl-nlmconv.1"
 		"share/man/man1/x86_64-nacl-nm.1"
 		"share/man/man1/x86_64-nacl-objcopy.1"
@@ -448,10 +447,11 @@ if (BUILD_BINUTILS)
 		"share/man/man1/x86_64-nacl-size.1"
 		"share/man/man1/x86_64-nacl-strings.1"
 		"share/man/man1/x86_64-nacl-strip.1"
-		"share/man/man1/x86_64-nacl-elfedit.1"
-		"share/man/man1/x86_64-nacl-windres.1"
 		"share/man/man1/x86_64-nacl-windmc.1"
-		"share/man/man1/x86_64-nacl-c++filt.1"
+		"share/man/man1/x86_64-nacl-windres.1"
+		"x86_64-nacl/bin/ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
+		"x86_64-nacl/bin/objcopy${CMAKE_EXECUTABLE_SUFFIX}"
+		"x86_64-nacl/bin/objdump${CMAKE_EXECUTABLE_SUFFIX}"
 	)
 
 	DeleteUselessFiles(binutils "${binutilsUselessFiles}")
