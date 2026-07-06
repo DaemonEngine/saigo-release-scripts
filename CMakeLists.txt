@@ -381,32 +381,19 @@ if (BUILD_BINUTILS)
 	add_dependencies(binutils binutils-binaries)
 
 	set(binutilsToolNames
-		addr2line
 		ar
 		as
-		c++filt
-		elfedit
-		gprof
 		nm
-		objcopy
-		objdump
 		ranlib
-		readelf
-		size
-		strings
-		strip
 		ld
-		ld.bfd
+		strip
 	)
 
 	set(binutilsDirectoryToolNames
 		ar
 		as
 		ld
-		ld.bfd
 		nm
-		objcopy
-		objdump
 		ranlib
 		strip
 	)
@@ -425,6 +412,19 @@ if (BUILD_BINUTILS)
 	add_dependencies(binutils-aliases binutils-lib64-alias)
 
 	set(binutilsUselessFiles
+		"bin/x86_64-nacl-addr2line${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-c++filt${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-elfedit${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-gprof${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-objcopy${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-objdump${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-readelf${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-size${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-strings${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
+		"x86_64-nacl/bin/ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
+		"x86_64-nacl/bin/objcopy${CMAKE_EXECUTABLE_SUFFIX}"
+		"x86_64-nacl/bin/objdump${CMAKE_EXECUTABLE_SUFFIX}"
 		"share/info/standards.info"
 		"share/info/configure.info"
 		"share/info/as.info"
