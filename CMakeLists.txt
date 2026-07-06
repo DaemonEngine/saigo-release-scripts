@@ -133,24 +133,84 @@ if (BUILD_CLANG)
 
 	add_dependencies(clang clang-binaries)
 
-	set(clangToolNames clang;clang++)
+	set(clangToolNames
+		clang
+		clang++
+	)
 
 	RenameBinaryAliases(clang "${clangToolNames}")
 	AddBinaryAliases(clang "${clangToolNames}")
 
-	set(clangUselessToolNames amdgpu-arch;analyze-build;clang-check;clang-cl;clang-extdef-mapping;clang-format;clang-installapi;clang-linker-wrapper;clang-nvlink-wrapper;clang-offload-bundler;clang-offload-packager;clang-refactor;clang-repl;clang-scan-deps;clang-sycl-linker;diagtool;git-clang-format;hmaptool;intercept-build;llvm-ar;llvm-cov;llvm-cxxfilt;llvm-dlltool;llvm-dwp;llvm-lib;llvm-mca;llvm-ml;llvm-nm;llvm-objcopy;llvm-objdump;llvm-pdbutil;llvm-profdata;llvm-profgen;llvm-ranlib;llvm-rc;llvm-readobj;llvm-size;llvm-strings;llvm-strip;llvm-symbolizer;nvptx-arch;scan-build;scan-build-py;scan-view)
+	set(clangUselessToolNames
+		amdgpu-arch
+		analyze-build
+		clang-check
+		clang-cl
+		clang-extdef-mapping
+		clang-format
+		clang-installapi
+		clang-linker-wrapper
+		clang-nvlink-wrapper
+		clang-offload-bundler
+		clang-offload-packager
+		clang-refactor
+		clang-repl
+		clang-scan-deps
+		clang-sycl-linker
+		diagtool
+		git-clang-format
+		hmaptool
+		intercept-build
+		llvm-ar
+		llvm-cov
+		llvm-cxxfilt
+		llvm-dlltool
+		llvm-dwp
+		llvm-lib
+		llvm-mca
+		llvm-ml
+		llvm-nm
+		llvm-objcopy
+		llvm-objdump
+		llvm-pdbutil
+		llvm-profdata
+		llvm-profgen
+		llvm-ranlib
+		llvm-rc
+		llvm-readobj
+		llvm-size
+		llvm-strings
+		llvm-strip
+		llvm-symbolizer
+		nvptx-arch
+		scan-build
+		scan-build-py
+		scan-view
+	)
 
 	DeleteUselessBinaries(clang "${clangUselessToolNames}")
 
-	set(clangUselessLibraryNames libclang;libLTO;libRemarks)
+	set(clangUselessLibraryNames
+		libclang
+		libLTO
+		libRemarks
+	)
 
 	DeleteUselessLibraries(clang "${clangUselessLibraryNames}")
 
-	set(clangUselessLibDirectoryNames libear;libscanbuild;cmake)
+	set(clangUselessLibDirectoryNames
+		libear
+		libscanbuild
+		cmake
+	)
 
 	DeleteUselessLibDirectories(clang "${clangUselessLibDirectoryNames}")
 
-	set(clangUselessDirectoryNames include;libexec;share)
+	set(clangUselessDirectoryNames
+		include
+		libexec
+		share
+	)
 
 	DeleteUselessDirectories(clang "${clangUselessDirectoryNames}")
 endif()
@@ -232,8 +292,36 @@ if (BUILD_BINUTILS)
 
 	add_dependencies(binutils binutils-binaries)
 
-	set(binutilsToolNames addr2line;ar;as;c++filt;elfedit;gprof;nm;objcopy;objdump;ranlib;readelf;size;strings;strip;ld;ld.bfd)
-	set(binutilsDirectoryToolNames ar;as;ld;ld.bfd;nm;objcopy;objdump;ranlib;strip)
+	set(binutilsToolNames
+		addr2line
+		ar
+		as
+		c++filt
+		elfedit
+		gprof
+		nm
+		objcopy
+		objdump
+		ranlib
+		readelf
+		size
+		strings
+		strip
+		ld
+		ld.bfd
+	)
+
+	set(binutilsDirectoryToolNames
+		ar
+		as
+		ld
+		ld.bfd
+		nm
+		objcopy
+		objdump
+		ranlib
+		strip
+	)
 
 	AddBinaryAliases(binutils "${binutilsToolNames}")
 	AddDirectoryAliases(binutils "${binutilsDirectoryToolNames}")
