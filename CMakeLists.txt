@@ -371,6 +371,10 @@ if (BUILD_BINUTILS)
 				--disable-gold
 				--disable-werror
 				--disable-nls
+				--disable-maintainer-mode
+				--disable-doc
+				--without-man
+				--without-info
 				--without-zlib
 				--disable-silent-rules
 				--disable-gdb
