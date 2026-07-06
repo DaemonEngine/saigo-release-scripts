@@ -321,7 +321,6 @@ if (BUILD_BINUTILS)
 	add_custom_target(binutils ALL)
 
 	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
-
 	set(BINUTILS_EXE_LINKER_FLAGS)
 
 	if (USE_LTO)
@@ -330,6 +329,8 @@ if (BUILD_BINUTILS)
 		if (MINGW)
 			string(APPEND BINUTILS_C_FLAGS " -Dffs=__builtin_ffs")
 		endif()
+
+		string(APPEND BINUTILS_EXE_LINKER_FLAGS " ${BINUTILS_CFLAGS}")
 	endif()
 
 	list(APPEND BINUTILS_ENV
