@@ -370,9 +370,10 @@ AddGitProject("binutils"
 	"0004-ld-makefile-in-do-not-build-libldtestplug-la-testplug-lo.patch"
 )
 
-set(REFERENCE_ARCH_NAME x86_64)
-set(ALIAS_BIN_ARCH_NAMES i686;arm)
-set(ALIAS_DIR_ARCH_NAMES arm)
+set(REFERENCE_SYSTEM_NAME "nacl")
+set(REFERENCE_ARCH_NAME "x86_64")
+set(ALIAS_BIN_ARCH_NAMES "i686" "arm")
+set(ALIAS_DIR_ARCH_NAMES "arm")
 
 function(RenameBinaryAliases targetName toolNames)
 	set(renamesName ${targetName}-renames)
@@ -395,7 +396,7 @@ function(RenameBinaryAliases targetName toolNames)
 	add_dependencies(${targetName} ${referenceName})
 
 	foreach(toolName ${toolNames})
-		set(aliasFile "${REFERENCE_ARCH_NAME}-nacl-${toolName}")
+		set(aliasFile "${REFERENCE_ARCH_NAME}-${REFERENCE_SYSTEM_NAME}-${toolName}")
 		set(aliasName "${targetName}-${aliasFile}")
 		set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasFile}${CMAKE_EXECUTABLE_SUFFIX}")
 
@@ -419,8 +420,8 @@ function(AddBinaryAliases targetName toolNames)
 
 	foreach(archName ${ALIAS_BIN_ARCH_NAMES})
 		foreach(toolName ${toolNames})
-			set(referenceName "${REFERENCE_ARCH_NAME}-nacl-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
-			set(aliasFile "${archName}-nacl-${toolName}")
+			set(referenceName "${REFERENCE_ARCH_NAME}-${REFERENCE_SYSTEM_NAME}-${toolName}${CMAKE_EXECUTABLE_SUFFIX}")
+			set(aliasFile "${archName}-${REFERENCE_SYSTEM_NAME}-${toolName}")
 			set(aliasName "${targetName}-${aliasFile}")
 			set(aliasPath "${CMAKE_INSTALL_PREFIX}/bin/${aliasFile}${CMAKE_EXECUTABLE_SUFFIX}")
 
@@ -443,10 +444,10 @@ function(AddDirectoryAliases targetName toolNames)
 	add_dependencies(${targetName} ${aliasesName})
 	add_dependencies(${aliasesName} ${targetName}-binaries)
 
-	set(referenceName "${REFERENCE_ARCH_NAME}-nacl")
+	set(referenceName "${REFERENCE_ARCH_NAME}-${REFERENCE_SYSTEM_NAME}")
 
 	foreach(archName ${ALIAS_DIR_ARCH_NAMES})
-		set(aliasDir "${archName}-nacl")
+		set(aliasDir "${archName}-${REFERENCE_SYSTEM_NAME}")
 		set(aliasName "${targetName}-${aliasDir}")
 		set(aliasPath "${CMAKE_INSTALL_PREFIX}/${aliasDir}")
 
