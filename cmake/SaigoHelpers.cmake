@@ -268,104 +268,22 @@ function(AddDirectoryAliases targetName toolNames)
 	endforeach()
 endfunction()
 
-function(DeleteUselessBinaries targetName toolNames)
-	set(deletesName ${targetName}-bin-deletes)
-	add_custom_target(${deletesName} ALL)
-	add_dependencies(${targetName} ${deletesName})
-	add_dependencies(${deletesName} ${targetName}-binaries)
+function(DeleteUselessFiles targetName filePaths)
+	list(APPEND deleteCommand "echo")
 
-	foreach(toolName ${toolNames})
-		set(deleteName "${targetName}-bin-${toolName}-delete")
-		set(deletePath "${CMAKE_INSTALL_PREFIX}/bin/${toolName}")
-
-		add_custom_target(${deleteName}
-			ALL
-			COMMAND
-				rm -f
-					"${deletePath}"
-					"${deletePath}${CMAKE_EXECUTABLE_SUFFIX}"
-					"${deletePath}.bat"
-			DEPENDS ${targetName}-binaries
+	foreach(filePath IN LISTS filePaths)
+		list(APPEND deleteCommand
+			&& ${CMAKE_COMMAND} -E rm -f "${CMAKE_INSTALL_PREFIX}/${filePath}"
 		)
-
-		add_dependencies(${deletesName} ${deleteName})
 	endforeach()
-endfunction()
 
-function(DeleteUselessLibraries targetName libNames)
-	set(deletesName "${targetName}-lib-deletes")
-	add_custom_target(${deletesName} ALL)
+	set(deletesName ${targetName}-deletes)
+
+	add_custom_target(${deletesName}
+		ALL
+		COMMAND ${deleteCommand}
+		DEPENDS ${targetName}-binaries
+	)
+
 	add_dependencies(${targetName} ${deletesName})
-	add_dependencies(${deletesName} ${targetName}-binaries)
-
-	foreach(libName ${libNames})
-		set(deleteName "${targetName}-lib-${libName}-delete")
-
-		set(libVersionSuffix ".${SAIGO_CLANG_VERSION}.0git")
-		set(libVersionLongSuffix ".${SAIGO_CLANG_VERSION}.0.0git")
-
-		if (WIN32)
-			set(sharedLibDir "bin")
-		else()
-			set(sharedLibDir "lib")
-		endif()
-
-		set(sharedDeletePath "${CMAKE_INSTALL_PREFIX}/${sharedLibDir}/${libName}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-		set(importDeletePath "${CMAKE_INSTALL_PREFIX}/lib/${libName}${CMAKE_IMPORT_LIBRARY_SUFFIX}")
-
-		add_custom_target(${deleteName}
-			ALL
-			COMMAND
-				rm -f
-					"${sharedDeletePath}"
-					"${sharedDeletePath}${libVersionSuffix}"
-					"${sharedDeletePath}${libVersionLongSuffix}"
-					"${importDeletePath}"
-			DEPENDS ${targetName}-binaries
-		)
-
-		add_dependencies(${deletesName} ${deleteName})
-	endforeach()
-endfunction()
-
-function(DeleteUselessLibDirectories targetName dirNames)
-	set(deletesName ${targetName}-libdir-deletes)
-	add_custom_target(${deletesName} ALL)
-	add_dependencies(${targetName} ${deletesName})
-	add_dependencies(${deletesName} ${targetName}-binaries)
-
-	foreach(dirName ${dirNames})
-		set(deleteName "${targetName}-${dirName}-delete")
-
-		set(deletePath "${CMAKE_INSTALL_PREFIX}/lib/${dirName}")
-
-		add_custom_target(${deleteName}
-			ALL
-			COMMAND rm -Rf "${deletePath}"
-			DEPENDS ${targetName}-binaries
-		)
-
-		add_dependencies(${deletesName} ${deleteName})
-	endforeach()
-endfunction()
-
-function(DeleteUselessDirectories targetName dirNames)
-	set(deletesName ${targetName}-dir-deletes)
-	add_custom_target(${deletesName} ALL)
-	add_dependencies(${targetName} ${deletesName})
-	add_dependencies(${deletesName} ${targetName}-binaries)
-
-	foreach(dirName ${dirNames})
-		set(deleteName "${targetName}-${dirName}-delete")
-
-		set(deletePath "${CMAKE_INSTALL_PREFIX}/${dirName}")
-
-		add_custom_target(${deleteName}
-			ALL
-			COMMAND rm -Rf "${deletePath}"
-			DEPENDS ${targetName}-binaries
-		)
-
-		add_dependencies(${deletesName} ${deleteName})
-	endforeach()
 endfunction()

@@ -289,29 +289,13 @@ if (BUILD_CLANG)
 	RenameBinaryAliases(clang "${clangToolNames}")
 	AddBinaryAliases(clang "${clangToolNames}")
 
-	set(clangUselessToolNames
-		clang-cl
-		hmaptool
+	set(clangUselessFiles
+		"bin/hmaptool"
+		"bin/clang-cl${CMAKE_EXECUTABLE_SUFFIX}"
+		"lib/cmake/llvm/LLVMConfigExtensions.cmake"
 	)
 
-	DeleteUselessBinaries(clang "${clangUselessToolNames}")
-
-	set(clangUselessLibraryNames
-	)
-
-	DeleteUselessLibraries(clang "${clangUselessLibraryNames}")
-
-	set(clangUselessLibDirectoryNames
-		cmake
-	)
-
-	DeleteUselessLibDirectories(clang "${clangUselessLibDirectoryNames}")
-
-	set(clangUselessDirectoryNames
-		share
-	)
-
-	DeleteUselessDirectories(clang "${clangUselessDirectoryNames}")
+	DeleteUselessFiles(clang "${clangUselessFiles}")
 endif()
 
 macro(addBinutilEnv NAME PATH)
@@ -438,6 +422,38 @@ if (BUILD_BINUTILS)
 	)
 
 	add_dependencies(binutils-aliases binutils-lib64-alias)
+
+	set(binutilsUselessFiles
+		"share/info/standards.info"
+		"share/info/configure.info"
+		"share/info/as.info"
+		"share/info/gprof.info"
+		"share/info/bfd.info"
+		"share/info/ld.info"
+		"share/info/binutils.info"
+		"share/info/dir"
+		"share/man/man1/x86_64-nacl-as.1"
+		"share/man/man1/x86_64-nacl-gprof.1"
+		"share/man/man1/x86_64-nacl-ld.1"
+		"share/man/man1/x86_64-nacl-addr2line.1"
+		"share/man/man1/x86_64-nacl-ar.1"
+		"share/man/man1/x86_64-nacl-dlltool.1"
+		"share/man/man1/x86_64-nacl-nlmconv.1"
+		"share/man/man1/x86_64-nacl-nm.1"
+		"share/man/man1/x86_64-nacl-objcopy.1"
+		"share/man/man1/x86_64-nacl-objdump.1"
+		"share/man/man1/x86_64-nacl-ranlib.1"
+		"share/man/man1/x86_64-nacl-readelf.1"
+		"share/man/man1/x86_64-nacl-size.1"
+		"share/man/man1/x86_64-nacl-strings.1"
+		"share/man/man1/x86_64-nacl-strip.1"
+		"share/man/man1/x86_64-nacl-elfedit.1"
+		"share/man/man1/x86_64-nacl-windres.1"
+		"share/man/man1/x86_64-nacl-windmc.1"
+		"share/man/man1/x86_64-nacl-c++filt.1"
+	)
+
+	DeleteUselessFiles(binutils "${binutilsUselessFiles}")
 endif()
 
 if (BUILD_NACL)
