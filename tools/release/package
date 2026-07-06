@@ -100,10 +100,10 @@ package_target ()
 
 	case "${target_name}" in
 		windows-*)
-			smart_copy -RL 'prefix' "${dir_name}"
+			smart_copy -RL 'install' "${dir_name}"
 		;;
 		*)
-			smart_copy -R 'prefix' "${dir_name}"
+			smart_copy -R 'install' "${dir_name}"
 		;;
 	esac
 
@@ -130,7 +130,7 @@ for target_name in "${@:-}"
 do
 	build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
-	if [ ! -d "${build_dir}/prefix" ]
+	if [ ! -d "${build_dir}/install" ]
 	then
 		echo "WARN: Missing ${target_name} built prefix" >&2
 		continue

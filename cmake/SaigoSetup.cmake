@@ -49,7 +49,7 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(TRIPLE_TARGET x86_64-nacl)
 
 	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/prefix" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/install" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
 	endif()
 
 	get_property(CMAKE_BUILD_TYPE_HELP CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING)

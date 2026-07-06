@@ -518,8 +518,12 @@ if (BUILD_SAIGOLIBS)
 	add_dependencies(saigolibs-aliases saigolibs-arm-libcxx-alias)
 endif()
 
+# This intentionally do not delete `${CMAKE_INSTALL_PREFIX}` but the
+# unmodified `${CMAKE_CURRENT_BINARY_DIR}/install` default value we set
+# ourselves, and will then fail to delete the directory when customized,
+# just in case someone does: `cmake -DCMAKE_INSTALL_PREFIX=/usr`…
 add_custom_target(distclean
     COMMAND
-		${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/prefix"
+		${CMAKE_COMMAND} -E remove_directory "${CMAKE_CURRENT_BINARY_DIR}/install"
 		&& ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}" --target clean
 )
