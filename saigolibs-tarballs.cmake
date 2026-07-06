@@ -1,49 +1,61 @@
-
-AddTarProject("x86_64-core"
+# Automatically generated, do not modify!
+AddTarProject("saigolibs"
+	"x86_64-core"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/core_sdk_libs_saigo_x86_64_66661f638c8413dfe326f1dc964aa80452e7c665.tgz"
 )
-AddTarProject("x86_64-libcxx"
+AddTarProject("saigolibs"
+	"x86_64-libcxx"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_x86_64_2eed47768333c50387107aa44f99050bf8099c36.tgz"
 )
-AddTarProject("x86_64-support"
+AddTarProject("saigolibs"
+	"x86_64-support"
 	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_x86_64_3069b07460fdace69c3ba395ad8b5f1a32f6ceaa.tgz"
 )
-AddTarProject("x86_64-newlib"
+AddTarProject("saigolibs"
+	"x86_64-newlib"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/newlib_saigo_x86_64_d4cfa2a5a4b3758d5ead0dfb709816f9c2ed68f2.tgz"
 )
-AddTarProject("i686-core"
+AddTarProject("saigolibs"
+	"i686-core"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/core_sdk_libs_saigo_i686_8419926d764b35159001facab30f72170b97d02c.tgz"
 )
-AddTarProject("i686-libcxx"
+AddTarProject("saigolibs"
+	"i686-libcxx"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_i686_4b2b95f9de8e2292eea2513bc5516ba97633c255.tgz"
 )
-AddTarProject("i686-support"
+AddTarProject("saigolibs"
+	"i686-support"
 	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_i686_e14a542fb9549bd6ac6bb9a0a58127f346f01706.tgz"
 )
-AddTarProject("i686-newlib"
+AddTarProject("saigolibs"
+	"i686-newlib"
 	"x86_64-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/newlib_saigo_i686_b0ea6ded1b0582ebd7e4afa9d858e92b1f79b50b.tgz"
 )
-AddTarProject("arm-core"
+AddTarProject("saigolibs"
+	"arm-core"
 	"arm-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/core_sdk_libs_saigo_arm_8bb52a32e194c5769d1db7fd022a8b890f419b00.tgz"
 )
-AddTarProject("arm-libcxx"
+AddTarProject("saigolibs"
+	"arm-libcxx"
 	"arm-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/libcxx_saigo_arm_37b6a1b0f8f4c1e67f19eb8fb6dfd4675a7e72d4.tgz"
 )
-AddTarProject("arm-support"
+AddTarProject("saigolibs"
+	"arm-support"
 	"lib"
 	"https://storage.googleapis.com/nativeclient-once/object/libs_support_saigo_arm_85492c8b2b577951e413f1ef1bd11cb19d44550b.tgz"
 )
-AddTarProject("arm-newlib"
+AddTarProject("saigolibs"
+	"arm-newlib"
 	"arm-nacl"
 	"https://storage.googleapis.com/nativeclient-once/object/newlib_saigo_arm_83761b72bd8878cedd023591f4fa55d85b8bfc52.tgz"
 )

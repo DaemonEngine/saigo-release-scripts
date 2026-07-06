@@ -176,34 +176,47 @@ else()
 	set(EXTERNAL_PROJECT_SOURCES_DIR "${EXTERNAL_PROJECT_BASE}/Sources")
 endif()
 
-option(BUILD_SAIGOLIBS "Build saigolibs." ON)
-
-if (BUILD_SAIGOLIBS)
-	add_custom_target(saigolibs ALL)
+if (CLONE_SHARED_REPOSITORIES)
+	set(DEFAULT_BUILD OFF)
+else()
+	set(DEFAULT_BUILD ON)
 endif()
 
-macro(AddTarProject NAME SUBDIR URL)
-	list(APPEND LIBRARY_TARBALLS ${SLUG})
+macro(AddTarProject PARENT_NAME NAME SUBDIR URL)
+	string(TOUPPER "${PARENT_NAME}" "${PARENT_SLUG}")
 	string(TOUPPER "${NAME}" SLUG)
-	set(DIR "${NAME}")
-	set(SUBDIR_${SLUG} "${SUBDIR}")
+	set(TARGET_SLUG "${PARENT_SLUG}_${SLUG}")
+	set(TARGET_NAME "${PARENT_NAME}-${NAME}")
 
-	set(TARBALL_${SLUG} ${URL} CACHE STRING "${NAME} repository.")
-	mark_as_advanced(TARBALL_${SLUG})
+	if (NOT DEFINED BUILD_${PARENT_SLUG})
+		option(BUILD_${PARENT_SLUG} "Build the ${PARENT_NAME}." "${DEFAULT_BUILD}")
+	endif()
+
+	if (BUILD_${PARENT_SLUG})
+		if (NOT TARGET "${PARENT_NAME}")
+			add_custom_target("${PARENT_NAME}" ALL)
+		endif()
+	endif()
+
+	set(DIR "${TARGET_NAME}")
+	set(SUBDIR_${TARGET_SLUG} "${SUBDIR}")
+
+	set(TARBALL_${TARGET_SLUG} ${URL} CACHE STRING "${TARGET_NAME} repository.")
+	mark_as_advanced(TARBALL_${TARGET_SLUG})
 
 	if (SHARED_REPOSITORIES_DIR)
-		set(SOURCE_DIR_${SLUG} "${SHARED_REPOSITORIES_DIR}/${DIR}")
+		set(SOURCE_DIR_${TARGET_SLUG} "${SHARED_REPOSITORIES_DIR}/${DIR}")
 	else()
-		set(SOURCE_DIR_${SLUG} "${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR}")
+		set(SOURCE_DIR_${TARGET_SLUG} "${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR}")
 	endif()
 
 	if (CLONE_SHARED_REPOSITORIES)
-		option(CLONE_${SLUG} "Clone the ${NAME}." ON)
+		option(CLONE_${TARGET_SLUG} "Clone the ${TARGET_NAME}." ON)
 
-		if (CLONE_${SLUG})
-			ExternalProject_Add("saigolibs-${NAME}-directory"
+		if (CLONE_${TARGET_SLUG})
+			ExternalProject_Add("${TARGET_NAME}-directory"
 				URL "${URL}"
-				SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
+				SOURCE_DIR "${SOURCE_DIR_${TARGET_SLUG}}"
 				CONFIGURE_COMMAND echo
 				BUILD_COMMAND echo
 				INSTALL_COMMAND echo
@@ -211,41 +224,43 @@ macro(AddTarProject NAME SUBDIR URL)
 			)
 		endif()
 	else()
-		option(BUILD_${SLUG} "Build ${NAME}." ON)
+		option(BUILD_${TARGET_SLUG} "Build the ${TARGET_NAME}." ON)
 	endif()
 
 	if (SHARED_REPOSITORIES_DIR)
-		set(SOURCE_DIR_${SLUG} ${SHARED_REPOSITORIES_DIR}/${DIR})
+		set(SOURCE_DIR_${TARGET_SLUG} ${SHARED_REPOSITORIES_DIR}/${DIR})
 
-		set(EP_OPTIONS_${SLUG}
-			SOURCE_DIR "${SOURCE_DIR_${SLUG}}"
+		set(EP_OPTIONS_${TARGET_SLUG}
+			SOURCE_DIR "${SOURCE_DIR_${TARGET_SLUG}}"
 		)
 	else()
-		set(EP_SOURCE_DIR_${SLUG} ${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR})
-		set(SOURCE_DIR_${SLUG} "${CMAKE_BINARY_DIR}/${EP_SOURCE_DIR_${SLUG}}")
+		set(EP_SOURCE_DIR_${TARGET_SLUG} ${EXTERNAL_PROJECT_SOURCES_DIR}/${DIR})
+		set(SOURCE_DIR_${TARGET_SLUG} "${CMAKE_BINARY_DIR}/${EP_SOURCE_DIR_${SLUG}}")
 
-		set(EP_OPTIONS_${SLUG}
-			SOURCE_DIR "${EP_SOURCE_DIR_${SLUG}}"
+		set(EP_OPTIONS_${TARGET_SLUG}
+			SOURCE_DIR "${EP_SOURCE_DIR_${TARGET_SLUG}}"
 			URL "${URL}"
 		)
 	endif()
 
-	if (BUILD_SAIGOLIBS AND BUILD_${SLUG})
-		ExternalProject_Add("saigolibs-${NAME}-binaries"
-			${EP_OPTIONS_${SLUG}}
+	if (BUILD_${PARENT_SLUG} AND BUILD_${TARGET_SLUG})
+		ExternalProject_Add("${TARGET_NAME}-binaries"
+			${EP_OPTIONS_${TARGET_SLUG}}
 			CONFIGURE_COMMAND echo
-			BUILD_COMMAND rsync -av "${SOURCE_DIR_${SLUG}}/." "."
+			BUILD_COMMAND echo
 			INSTALL_COMMAND
-				mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}"
-				&& rsync -av "." "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${SLUG}}/."
+				mkdir -p "${CMAKE_INSTALL_PREFIX}/${SUBDIR_${TARGET_SLUG}}"
+				&& rsync -av
+					"${SOURCE_DIR_${TARGET_SLUG}}/."
+					"${CMAKE_INSTALL_PREFIX}/${SUBDIR_${TARGET_SLUG}}/."
 			DOWNLOAD_EXTRACT_TIMESTAMP ON
 		)
 
-		add_dependencies(saigolibs saigolibs-${NAME}-binaries)
+		add_dependencies(${PARENT_NAME} ${TARGET_NAME}-binaries)
 	endif()
 endmacro()
 
-include(tarballs.cmake)
+include(saigolibs-tarballs.cmake)
 
 if (BUILD_SAIGOLIBS)
 	# x86_64-nacl/include and arm-nacl/include are exactly the same

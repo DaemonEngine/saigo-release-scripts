@@ -65,19 +65,20 @@ for archive in content["package_targets"]["linux_x86"]["archives"]:
 				else:
 					data[arch][pack]["subdir"] = "{}-nacl".format(dir_arch)
 
-content = ""
+content = "# Automatically generated, do not modify!"
 
 for arch in archs:
 	for pack in packs.keys():
 		p = data[arch][pack]
 		content += """
-AddTarProject("{}"
+AddTarProject("saigolibs"
+	"{}"
 	"{}"
 	"{}"
 )""".format(p["target"], p["subdir"], p["url"])
 
 dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-file_path = os.path.join(dir_path, "tarballs.cmake")
+file_path = os.path.join(dir_path, "saigolibs-tarballs.cmake")
 
 with open(file_path, "w", encoding="utf-8") as f:
 	f.write(content)
