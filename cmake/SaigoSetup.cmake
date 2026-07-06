@@ -1,0 +1,162 @@
+option(CLONE_SHARED_REPOSITORIES "Clone shared sources dir (and only do that)." OFF)
+
+if (CLONE_SHARED_REPOSITORIES)
+	set(DEFAULT_SHARED_REPOSITORIES "${CMAKE_CURRENT_BINARY_DIR}")
+else()
+	set(DEFAULT_SHARED_REPOSITORIES "")
+endif()
+
+set(SHARED_REPOSITORIES_DIR "${DEFAULT_SHARED_REPOSITORIES_DIR}" CACHE PATH "Shared repositories dir (doesn't use any if empty).")
+
+set(EXTERNAL_PROJECT_BASE ExternalProjects)
+set_directory_properties(PROPERTIES EP_BASE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_PROJECT_BASE}")
+
+if (CLONE_SHARED_REPOSITORIES)
+	set(EXTERNAL_PROJECT_SOURCES_DIR "${CMAKE_BINARY_DIR}")
+else()
+	set(EXTERNAL_PROJECT_SOURCES_DIR "${EXTERNAL_PROJECT_BASE}/Sources")
+endif()
+
+if (CLONE_SHARED_REPOSITORIES)
+	set(DEFAULT_BUILD OFF)
+else()
+	set(DEFAULT_BUILD ON)
+endif()
+
+if (NOT CLONE_SHARED_REPOSITORIES)
+	enable_language(C)
+	enable_language(CXX)
+
+	include(CheckLinkerFlag)
+
+	include(Yokai/Detection)
+
+	set(FLAGS_LIST "${CMAKE_C_FLAGS}")
+	separate_arguments(FLAGS_LIST)
+
+	execute_process(
+		COMMAND "${CMAKE_C_COMPILER}" ${FLAGS_LIST} -dumpmachine
+		OUTPUT_VARIABLE TRIPLE_HOST
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	execute_process(
+		COMMAND cc -dumpmachine
+		OUTPUT_VARIABLE TRIPLE_BUILD
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+
+	set(TRIPLE_TARGET x86_64-nacl)
+
+	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/prefix" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+	endif()
+
+	get_property(CMAKE_BUILD_TYPE_HELP CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
+	set(CONFIGURE_COMPILER_FLAGS "-O3")
+
+	macro(FindTool SLUG FILE NAME ENABLEMENT)
+		find_program(PATH_${SLUG} NAMES ${FILE})
+
+		set(DEFAULT_${SLUG} ${ENABLEMENT})
+
+		if (NOT PATH_${SLUG})
+				set(DEFAULT_${SLUG} OFF)
+		endif()
+
+		option(USE_${SLUG} "Enable ${NAME} when possible." ${DEFAULT_${SLUG}})
+	endmacro()
+
+	# Mold doesn't work properly on FreeBSD.
+	if (YOKAI_HOST_SYSTEM_FREEBSD)
+		set(DEFAULT_MOLD OFF)
+	else()
+		set(DEFAULT_MOLD ON)
+	endif()
+
+	FindTool("CCACHE" "ccache" "Ccache compiler cache" ON)
+	FindTool("ICECC" "icecc" "IceCream distributed compiler scheduler" ON)
+	FindTool("NINJA" "ninja" "Ninja builder" ON)
+	FindTool("MOLD" "mold" "Mold linker" "${DEFAULT_MOLD}")
+
+	if (USE_CCACHE)
+		# Options come from LLVM CMakeLists.txt file.
+		set(ENV${CCACHE_CPP2} "yes")
+		set(ENV${CCACHE_HASHDIR} "yes")
+		set(EP_COMPILER_LAUNCHER "${PATH_CCACHE}")
+		set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
+		set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
+
+		if (USE_ICECC)
+			set(ENV{CCACHE_PREFIX} "${PATH_ICECC}")
+		endif()
+	elseif (USE_ICECC)
+		set(EP_COMPILER_LAUNCHER "${PATH_ICECC}")
+		set(EP_C_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_C_COMPILER}")
+		set(EP_CXX_COMPILER "${EP_COMPILER_LAUNCHER} ${CMAKE_CXX_COMPILER}")
+		set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
+		set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
+	endif()
+
+	if (USE_NINJA)
+		set(EP_GENERATOR "Ninja")
+		list(APPEND EP_CMAKE_ARGS "-DCMAKE_MAKE_PROGRAM=${PATH_NINJA}")
+	else()
+		set(EP_GENERATOR "${CMAKE_GENERATOR}")
+	endif()
+
+	if (USE_MOLD AND NOT MINGW)
+		set(MOLD_FLAG "-fuse-ld=${PATH_MOLD}")
+		check_linker_flag("C" ${MOLD_FLAG} FUSE_LD_MOLD)
+
+		if (FUSE_LD_MOLD)
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} ${MOLD_FLAG}")
+			set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
+		endif()
+	endif()
+
+	if (YOKAI_TARGET_SYSTEM_MACOS)
+		if (NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+			set(COMPILER_FLAGS "${COMPILER_FLAGS} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+		endif()
+	endif()
+
+	option(USE_LTO "Enable link-time optimization." OFF)
+
+	if (USE_LTO)
+		if (YOKAI_CXX_COMPILER_CLANG)
+			set(FLTO_VALUE "thin")
+		else()
+			set(FLTO_VALUE "auto")
+		endif()
+
+		set(LTO_FLAGS "-flto=${FLTO_VALUE} -fno-fat-lto-objects")
+
+		# FreeBSD and macOS clang don't support -fno-fat-lto-objects.
+		set(LTO_FLAGS "${COMPILER_FLAGS} -Wno-ignored-optimization-argument")
+
+		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
+	endif()
+
+	if (YOKAI_CXX_COMPILER_MINGW)
+		string(APPEND EXE_LINKER_FLAGS " -static -static-libstdc++ -static-libgcc")
+	endif()
+
+	set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
+	set(EP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
+	set(EP_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS}")
+
+	if (CMAKE_OSX_DEPLOYMENT_TARGET)
+		list(APPEND EP_CMAKE_ARGS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+	endif()
+
+	if (CMAKE_TOOLCHAIN_FILE)
+		list(APPEND EP_CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+	else()
+		# This is expected when cross-compiling, also sets CMAKE_CROSSCOMPILING.
+		# See: https://llvm.org/docs/HowToCrossCompileLLVM.html
+		list(APPEND EP_CMAKE_ARGS "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+	endif()
+endif()
