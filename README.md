@@ -11,11 +11,13 @@ The Dæmon engine is the open-source game engine powering the [Unvanquished game
 
 Saigo is a modern toolchain for compiling Native Client applications.
 
-Google publicly announced [in May of 2017](https://www.tomshardware.com/news/chrome-deprecates-pnacl-embraces-webassembly%2C34583.html) the (then-)upcoming deprecation and abandonment of Native Client technologies in favor of WebAssembly, and announced the actual deprecation [in 2020](https://developer.chrome.com/deprecated).
-But Google also [supported](https://developer.chrome.com/docs/native-client) Native Client-powered ChromeOS 138 until ChromeOS 129 [in July of 2025](https://support.google.com/chrome/a/answer/10314655?&#139) and as such continued developpement of some Native Client technologies.
-This extra development materialized in the maintenance of a toolchain named Saigo, frequently rebased on the latest LLVM upstream at the time. Saigo received commits from Google until January of 2025 and the last rebase was over Clang 21.
+Native Client, aka NaCl, is a sandboxing technology for running untrusted native code in a trusted application. Historically thought to run boring web application in a web browser, this also makes possible for our game engine download and run fun custom games from game servers.
 
-Google never compiled Saigo for something else than Linux amd64, and their build process relied on a very complex collection of repositories involving prebuilt binaries. This project not only makes possible to rebuild Saigo for your preferred system and architecture, but does it without running any shady precompiled executable provided by Google.
+Google publicly announced [in May of 2017](https://blog.chromium.org/2017/05/goodbye-pnacl-hello-webassembly.html) the (then-)upcoming deprecation and abandonment of Native Client technologies in favor of WebAssembly, and announced the actual deprecation [in 2020](https://developer.chrome.com/deprecated).
+But Google also [supported](https://developer.chrome.com/docs/native-client) Native Client-powered ChromeOS 138 until ChromeOS 139 [in July of 2025](https://support.google.com/chrome/a/answer/10314655?&#139) and as such continued developpement of some Native Client technologies.
+This extra development materialized in the maintenance of a toolchain named Saigo, frequently rebased on the latest LLVM upstream at the time. Saigo received commits from Google [until January of 2025](https://chromium.googlesource.com/native_client/nacl-llvm-project-v10/+/9c7f0369cfdd591e580c5ccfc1f00fedee58029f) and the last rebase was over Clang 21.
+
+Google never compiled the Saigo software development kit for something else than Linux on amd64, and their build process relied on a very complex collection of repositories involving prebuilt binaries. This project not only makes possible to rebuild Saigo for your preferred system and architecture, but does it without running any shady precompiled executable provided by Google.
 
 This repository doesn't contain any Saigo code, it provides scripts to build Saigo using Google upstream repositories:
 
@@ -24,9 +26,11 @@ This repository doesn't contain any Saigo code, it provides scripts to build Sai
 
 We provide patches (stored in this repository) that CMake automatically applies over upstream repositories before building the software. Those patches keep the tools buildables and makes them more cross-platform (buildable for more systems and architectures).
 
-The related project to rebuild without Google's complex collection of repositories and without shady Google's precompiled binaries and with our own fixes the Native Client loader can be found there:
+This also ships with the compilers some NaCl C/C++ headers historically stored in the loader repository, those are fetched from the related project to rebuild the Native Client loader that can be found there:
 
-- [github.com/DaemonEngine/native_client](https://github.com/DaemonEngine/native_client)
+- [github.com/DaemonEngine/native_client](https://github.com/DaemonEngine/native_client) (Native Client runtime)
+
+This other project makes possible to rebuild the loader without Google's complex collection of repositories and without shady Google's precompiled binaries and with our own fixes. We don't ship the runtime with Saigo and it may have his own release cycle.
 
 In Japanese, _Saigo_ (さいご / 最後) means “_the last_”, “_the end_”, “_the final_” or “_the conclusion_”. This refers to the end of an era, the final stage of an event, or the last item in a sequence…
 
@@ -60,9 +64,9 @@ This is only about running the compilers natively to compile NaCl code, the NaCl
 
 The Windows build is meant to be cross-compiled on Linux using MinGW.
 
-For now, the libc and libc++ libraries are copied from pre-compiled libraries provided by Google.
+For now, the libc and libc++ libraries are copied from pre-compiled libraries provided by Google. The libc is based on [Newlib](https://www.sourceware.org/newlib/).
 
-Those libraries only contribute to binaries that run inside in the untrusted environment within the Native Client virtual machine, meaning no pre-compiled code runs in the trusted environement outside of the Native Client virtual machine.
+Those libraries only contribute to untrusted binaries that run inside in the untrusted environment within the Native Client virtual machine, meaning no pre-compiled code runs in the trusted environement outside of the Native Client sandbox.
 
 This project then already achieved the ability for someone to be able to recompile all the trusted code and then don't have to trust any precompiled code.
 
@@ -119,17 +123,17 @@ Release packaging script
 
 - `tar` (GNU or BSD)
 - `xz`
-- `jdupes` or `rdfind`  
+- `jdupes` or `rdfind`
    Optional, but recommended to deduplicate tarball content before packaging.
 
 Recommended:
 
-- [`ccache`](https://ccache.dev)  
-  Can save recompilation time if when you want to restart the build.  
+- [`ccache`](https://ccache.dev)
+  Can save recompilation time if when you want to restart the build.
   It can be used with [`icecc`](https://github.com/icecc/icecream) to distribute the build if also present.
-- [`ninja`](https://ninja-build.org)  
+- [`ninja`](https://ninja-build.org)
   May be more efficient than Make, will be used for building LLVM if present.
-- [`mold`](https://github.com/rui314/mold)  
+- [`mold`](https://github.com/rui314/mold)
   May be faster than usual linkers, will be used if present and known to work on the build system.
 
 CMake will automatically use those tools when found in `PATH`.
@@ -153,7 +157,7 @@ cmake ..
 make -j8
 ```
 
-A compiler toolchain can then be found in `build/prefix`.
+The Saigo SDK can then be found in `build/install`.
 
 The binutils build relies on autotools and GNU Make, so `gmake` has to be used instead of `make` on BSD systems.
 
@@ -163,13 +167,13 @@ Building LLVM may require 8GB per link task, especially when building it with LT
 
 CMake will replace many known duplicates with symbolinc links.
 
-One can clean the build (including the deletion of the `prefix/` directory) with:
+One can clean the build (including the deletion of the `install/` directory) with:
 
 ```
 make distclean
 ```
 
-This runs the standard `make clean` action to clean-up build temporary files and reset the build progression, and deletes the `prefix` directory where things have been installed.
+This runs the standard `make clean` action to clean-up build temporary files and reset the build progression, and deletes the `install/` directory where things have been installed.
 
 
 ### Release multi build
@@ -193,12 +197,12 @@ tools/release/build macos-amd64 macos-arm64
 On FreeBSD:
 
 ```
-tools/release/build freebsd-amd64
+tools/release/build freebsd-amd64 freebsd-i686
 ```
 
-The configuration for the targets is stored in the `tools/release/conf` directory.
+The configuration for the targets is stored in the `tools/release/conf/` directory.
 
-The build directory will be `build/<target>` and the built files will be `build/<target>/prefix`.
+The build directory will be `build/<target>/` and the built files will be `build/<target>/install/`.
 
 For building targets using LTO, one can do:
 
@@ -216,10 +220,10 @@ The `build` task makes heavy usage of symbolic links to deduplicates file (see a
 Packaging requires the Release multi build script to be used first.
 
 ```
-tools/release/package freebsd-amd64 linux-amd64 linux-arm64 linux-armhf linux-i686 linux-loong64 linux-ppc64el linux-riscv64 macos-amd64 macos-arm64 windows-amd64 windows-i686
+tools/release/package freebsd-amd64 freebsd-i686 linux-amd64 linux-arm64 linux-armhf linux-i686 linux-loong64 linux-ppc64el linux-riscv64 macos-amd64 macos-arm64 windows-amd64 windows-i686
 ```
 
-The packaged archives will be found in the `build/packages` directory, and the archives will be named `saigocc-<target>_version-<commit date>.tar.xz`.
+The packaged archives will be found in the `build/packages/saigocc_version-<commit date>` directory, and the archives will be named `saigocc-<target>_version-<commit date>.tar.xz`, along with a checksum file.
 
 The `package` task will use `jdupes` or `rdfind` (if present) to deduplicate files even more using hard links before storing them in the tarball.
 
@@ -231,7 +235,7 @@ All symbolink links are turned into hardlinks in the Windows tarballs to both pr
 This runs the custom `make distclean` action (see above).
 
 ```
-tools/release/package linux-amd64 linux-arm64 linux-armhf linux-i686 linux-loong64 linux-ppc64el linux-riscv64 macos-amd64 macos-arm64 windows-amd64 windows-i686
+tools/release/package freebsd-amd64 freebsd-i686 linux-amd64 linux-arm64 linux-armhf linux-i686 linux-loong64 linux-ppc64el linux-riscv64 macos-amd64 macos-arm64 windows-amd64 windows-i686
 ```
 
 
@@ -304,7 +308,7 @@ Saigo itself can be built for `mipsel`, and the NaCl loader can be built for `mi
 
 Unlike PNaCl, Saigo doesn't compile to `pexe`, so the application code should be rebuilt as `nexe` for every target platform instead of compiling one `pexe` once and translating it to multiple `nexe` after that. The `pexe` to `nexe` translation being very slow, the iterative rebuild of three targets is faster anyway.
 
-It also means precompiled `pexe` static libraries for various common libraries provided by Google (FreeType, etc.) cannot be used. Migrating a project to Saigo may then require to rebuild some dependencies.
+It also means precompiled `pexe` static libraries for various common libraries provided by Google (FreeType, etc.) cannot be used. Migrating a project from PNaCl to Saigo may then require to rebuild some dependencies.
 
 
 ## Limitations
