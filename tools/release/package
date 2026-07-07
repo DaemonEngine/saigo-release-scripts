@@ -24,7 +24,6 @@ set -e -u -o pipefail
 
 export script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 export repo_dir="$(git rev-parse --show-toplevel)"
-export paks_dir="${repo_dir}/build/packages"
 
 export nproc_count="$("${script_dir}/nproc")"
 
@@ -48,6 +47,8 @@ export git_date="$(git log -1 --format='%ct')"
 export touch_date="$(print_date "${git_date}" '+%Y-%m-%dT%H:%M:%S')"
 export version_date="$(print_date "${git_date}" '+%Y%m%d')"
 export version_string="21.0-${version_date}"
+export product_name='saigocc'
+export release_dir="${repo_dir}/build/packages/${product_name}${NAME_SUFFIX}_${version_string}"
 
 export XZ_OPTS="${XZ_OPTS:--9e}"
 
@@ -88,7 +89,7 @@ package_target ()
 {
 	local target_name="${1}"
 
-	local dir_name="saigocc-${target_name}${NAME_SUFFIX}_${version_string}"
+	local dir_name="${product_name}-${target_name}${NAME_SUFFIX}_${version_string}"
 	local pak_name="${dir_name}.tar.xz"
 
 	echo "Packaging ${target_name} as ${pak_name}"
@@ -111,15 +112,15 @@ package_target ()
 
 	find "${dir_name}" -exec touch -d "${touch_date}" {} \;
 
-	mkdir -p "${paks_dir}"
+	mkdir -p "${release_dir}"
 
-	local pak_path="${paks_dir}/${pak_name}"
+	local pak_path="${release_dir}/${pak_name}"
 
 	rm -f "${pak_path}"
 
 	tar -C "${build_dir}" -cJf "${pak_path}" "${dir_name}"
 
-	touch -d "${touch_date}" "${paks_dir}/${pak_name}"
+	touch -d "${touch_date}" "${release_dir}/${pak_name}"
 }
 
 export -f package_target
@@ -159,7 +160,7 @@ then
 
 	sum_name="saigocc${NAME_SUFFIX}_${version_string}.sha512sum"
 
-	cd "${repo_dir}/build/packages"
+	cd "${release_dir}"
 
 	sha512sum -b $(ls "${archive_names[@]}" | sort) > "${sum_name}"
 	touch -d "${touch_date}" "${sum_name}"
