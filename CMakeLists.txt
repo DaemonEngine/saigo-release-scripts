@@ -384,7 +384,6 @@ if (BUILD_BINUTILS)
 		ar
 		as
 		ld
-		nm
 		ranlib
 		strip
 	)
@@ -393,7 +392,6 @@ if (BUILD_BINUTILS)
 		ar
 		as
 		ld
-		nm
 		ranlib
 		strip
 	)
@@ -418,8 +416,7 @@ if (BUILD_BINUTILS)
 		"bin/x86_64-nacl-gprof${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-ld.bfd${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-objcopy${CMAKE_EXECUTABLE_SUFFIX}"
-		"bin/x86_64-nacl-objdump${CMAKE_EXECUTABLE_SUFFIX}"
-		"bin/x86_64-nacl-readelf${CMAKE_EXECUTABLE_SUFFIX}"
+		"bin/x86_64-nacl-nm${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-size${CMAKE_EXECUTABLE_SUFFIX}"
 		"bin/x86_64-nacl-strings${CMAKE_EXECUTABLE_SUFFIX}"
 		"share/info/as.info"
