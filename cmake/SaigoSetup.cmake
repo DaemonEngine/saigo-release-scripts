@@ -128,6 +128,12 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		endif()
 	endif()
 
+	if (YOKAI_TARGET_SYSTEM_MACOS)
+		set(INSTALL_RPATH "$ORIGIN/../lib")
+	else()
+		set(INSTALL_RPATH "@executable_path/../lib")
+	endif()
+
 	option(USE_LTO "Enable link-time optimization." OFF)
 
 	if (USE_LTO)

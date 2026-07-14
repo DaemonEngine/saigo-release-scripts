@@ -66,12 +66,6 @@ set(ALIAS_DIR_ARCH_NAMES "arm")
 if (BUILD_CLANG)
 	add_custom_target(clang ALL)
 
-	if (APPLE)
-		set(INSTALL_RPATH "$ORIGIN/../lib")
-	else()
-		set(INSTALL_RPATH "@executable_path/../lib")
-	endif()
-
 	if (USE_LTO)
 		if (NOT MINGW)
 			set(LLVM_LTO "${FLTO_VALUE}")
