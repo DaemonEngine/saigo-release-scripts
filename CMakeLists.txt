@@ -456,7 +456,7 @@ if (BUILD_BINUTILS)
 endif()
 
 if (BUILD_NACL)
-	option(BUILD_NACL_INCLUDE "Build the nacl include" ON)
+	option(BUILD_NACL_INCLUDE "Build the nacl include." ON)
 endif()
 
 if (BUILD_NACL AND BUILD_NACL_INCLUDE)
