@@ -53,7 +53,7 @@ AddGitProject("binutils"
 AddGitProject("nacl"
 	"native_client"
 	"https://github.com/DaemonEngine/native_client.git"
-	"ae29840014b5c08c7733ee9257741d421723255a"
+	"illwieckz/cmake-tls-edit"
 )
 
 include(saigolibs-tarballs.cmake)
@@ -65,14 +65,6 @@ set(ALIAS_DIR_ARCH_NAMES "arm")
 
 if (BUILD_CLANG)
 	add_custom_target(clang ALL)
-
-	if (USE_LTO)
-		if (NOT MINGW)
-			set(LLVM_LTO "${FLTO_VALUE}")
-		endif()
-	else()
-		set(LLVM_LTO "OFF")
-	endif()
 
 	set(ENV{CCACHE_PREFIX} "${PATH_ICECC}")
 
@@ -451,6 +443,7 @@ endif()
 
 if (BUILD_NACL)
 	option(BUILD_NACL_INCLUDE "Build the nacl include." ON)
+	option(BUILD_NACL_TLSEDIT "Build the tls_edit tool." ON)
 endif()
 
 if (BUILD_NACL AND BUILD_NACL_INCLUDE)
@@ -479,6 +472,43 @@ if (BUILD_NACL AND BUILD_NACL_INCLUDE)
 		BUILD_COMMAND echo
 		INSTALL_COMMAND ${include_command}
 	)
+endif()
+
+if (BUILD_NACL AND BUILD_NACL_TLSEDIT)
+	add_custom_target(nacl-tls_edit ALL)
+
+	if (USE_LTO)
+		if (NOT MINGW)
+			set(LLVM_LTO "${FLTO_VALUE}")
+		endif()
+	else()
+		set(LLVM_LTO "OFF")
+	endif()
+
+	set(ENV{CCACHE_PREFIX} "${PATH_ICECC}")
+
+	ExternalProject_Add(nacl-tls_edit-binaries
+		SOURCE_DIR "${SOURCE_DIR_NACL}/src/tools/tls_edit"
+		CMAKE_GENERATOR "${EP_GENERATOR}"
+		CMAKE_ARGS
+			"${EP_CMAKE_ARGS}"
+			"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+			"-DCMAKE_INSTALL_RPATH=${INSTALL_RPATH}"
+			"-DCMAKE_C_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
+			"-DCMAKE_C_COMPILER=${EP_C_COMPILER}"
+			"-DCMAKE_C_FLAGS=${EP_C_FLAGS} ${LTO_FLAGS}"
+			"-DCMAKE_CXX_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
+			"-DCMAKE_CXX_COMPILER=${EP_CXX_COMPILER}"
+			"-DCMAKE_CXX_FLAGS=${EP_CXX_FLAGS} ${LTO_FLAGS}"
+			"-DCMAKE_EXE_LINKER_FLAGS=${EP_EXE_LINKER_FLAGS}"
+		BUILD_COMMAND
+			${CMAKE_COMMAND} -E env ${BUILD_ENV}
+				${CMAKE_COMMAND} --build .
+		INSTALL_COMMAND ${CMAKE_COMMAND} --install . --strip
+	)
+
+	add_dependencies(nacl-tls_edit nacl-tls_edit-binaries)
 endif()
 
 if (BUILD_SAIGOLIBS)
