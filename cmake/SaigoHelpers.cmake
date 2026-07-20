@@ -337,7 +337,7 @@ macro(AddConfigureEnv NAME VALUE)
 	list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
 endmacro()
 
-macro(AddConfigureTripleEnv NAME PATH)
+macro(AddTripleConfigureEnv NAME PATH)
 	find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
 
 	if (PATH_TRIPLE_${NAME})
@@ -346,7 +346,7 @@ macro(AddConfigureTripleEnv NAME PATH)
 		set(TRIPLE_${NAME} "${PATH}")
 	endif()
 
-	AddConfigureEnv("${NAME}" "${PATH_TRIPLE_${NAME}}")
+	AddConfigureEnv("${NAME}" "${TRIPLE_${NAME}}")
 endmacro()
 
 macro(EnableConfigureLTO NAME)
