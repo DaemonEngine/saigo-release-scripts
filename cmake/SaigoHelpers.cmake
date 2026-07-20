@@ -395,5 +395,7 @@ macro(AddCompilerConfigureEnv NAME LANGS)
 	AddConfigureEnv("${NAME}"
 		"LDFLAGS=${${NAME}_EXE_LINKER_FLAGS_STRING}"
 		"MAKEINFO=true"
+		"CC_FOR_BUILD=cc"
+		"STRIPPROG=${TRIPLE_STRIP}"
 	)
 endmacro()

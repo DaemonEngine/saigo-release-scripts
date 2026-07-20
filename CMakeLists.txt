@@ -310,11 +310,6 @@ if (BUILD_BINUTILS)
 
 	AddCompilerConfigureEnv("BINUTILS" "C")
 
-	AddConfigureEnv("BINUTILS"
-		"CC_FOR_BUILD=cc"
-		"STRIPPROG=${TRIPLE_STRIP}"
-	)
-
 	ExternalProject_Add(binutils-binaries
 		${EP_OPTIONS_BINUTILS}
 		CONFIGURE_COMMAND
