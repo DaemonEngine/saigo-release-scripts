@@ -302,6 +302,15 @@ if (BUILD_BINUTILS)
 	list(APPEND BINUTILS_C_FLAGS ${EP_C_FLAGS})
 	list(APPEND BINUTILS_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
 
+	AddCCompilerFlags("BINUTILS"
+		"-Wno-absolute-value"
+		"-Wno-unused-function"
+		"-Wno-unused-const-variable"
+		"-Wno-unneeded-internal-declaration"
+		"-Wno-unused-private-field"
+		"-Wno-format-security"
+	)
+
 	if (USE_LTO)
 		list(APPEND BINUTILS_C_FLAGS ${LTO_FLAGS})
 
@@ -311,15 +320,6 @@ if (BUILD_BINUTILS)
 
 		list(APPEND BINUTILS_EXE_LINKER_FLAGS ${BINUTILS_CFLAGS})
 	endif()
-
-	addCCompilerFlags("BINUTILS"
-		"-Wno-absolute-value"
-		"-Wno-unused-function"
-		"-Wno-unused-const-variable"
-		"-Wno-unneeded-internal-declaration"
-		"-Wno-unused-private-field"
-		"-Wno-format-security"
-	)
 
 	listToString("BINUTILS_C_FLAGS")
 	listToString("BINUTILS_EXE_LINKER_FLAGS")
