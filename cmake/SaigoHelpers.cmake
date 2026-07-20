@@ -306,3 +306,15 @@ macro(AddCCompilerFlags NAME)
 		endif()
 	endforeach()
 endmacro()
+
+macro(EnableConfigureLTO NAME)
+	if (USE_LTO)
+		list(APPEND ${NAME}_C_FLAGS ${LTO_FLAGS})
+
+		if (YOKAI_C_COMPILER_MINGW)
+			list(APPEND ${NAME}_C_FLAGS "-Dffs=__builtin_ffs")
+		endif()
+
+		list(APPEND ${NAME}_EXE_LINKER_FLAGS ${${NAME}_CFLAGS})
+	endif()
+endmacro()

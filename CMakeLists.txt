@@ -303,15 +303,7 @@ if (BUILD_BINUTILS)
 		"-Wno-format-security"
 	)
 
-	if (USE_LTO)
-		list(APPEND BINUTILS_C_FLAGS ${LTO_FLAGS})
-
-		if (YOKAI_C_COMPILER_MINGW)
-			list(APPEND BINUTILS_C_FLAGS "-Dffs=__builtin_ffs")
-		endif()
-
-		list(APPEND BINUTILS_EXE_LINKER_FLAGS ${BINUTILS_CFLAGS})
-	endif()
+	EnableConfigureLTO("BINUTILS")
 
 	ListToString("BINUTILS_C_FLAGS")
 	ListToString("BINUTILS_EXE_LINKER_FLAGS")
