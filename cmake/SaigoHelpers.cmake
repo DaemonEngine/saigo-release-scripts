@@ -381,12 +381,14 @@ macro(AddCompilerConfigureEnv NAME LANGS)
 	ListToString("${NAME}_DEFINITIONS")
 
 	foreach(LANG IN ITEMS ${LANGS})
-		list(APPEND ${NAME}_${LANG}_FLAGS ${${NAME}_DEFINITIONS})
+		list(APPEND ${NAME}_${LANG}_FLAGS ${MOLD_COMPILER_FLAGS} ${${NAME}_DEFINITIONS})
 
 		ListToString("${NAME}_${LANG}_FLAGS")
 
 		AddConfigureEnv("${NAME}" "CFLAGS=${${NAME}_${LANG}_FLAGS_STRING}")
 	endforeach()
+
+	list(APPEND ${NAME}_EXE_LINKER_FLAGS ${MOLD_EXE_LINKER_FLAGS})
 
 	ListToString("${NAME}_EXE_LINKER_FLAGS")
 
@@ -395,7 +397,7 @@ endmacro()
 
 macro(AddCompilerCmakeArgs NAME LANGS)
 	foreach(lang IN ITEMS C CXX)
-		list(APPEND CLANG_${lang}_FLAGS ${EP_${lang}_FLAGS})
+		list(APPEND CLANG_${lang}_FLAGS ${EP_${lang}_FLAGS} ${MOLD_COMPILER_FLAGS})
 
 		ListToString(CLANG_${lang}_FLAGS)
 
@@ -406,7 +408,7 @@ macro(AddCompilerCmakeArgs NAME LANGS)
 		)
 	endforeach()
 
-	list(APPEND CLANG_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
+	list(APPEND CLANG_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS} ${MOLD_EXE_LINKER_FLAGS})
 
 	ListToString(CLANG_EXE_LINKER_FLAGS)
 

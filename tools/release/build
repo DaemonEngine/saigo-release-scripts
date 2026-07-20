@@ -60,6 +60,8 @@ then
 	echo "Using IceCC"
 fi
 
+export USE_MOLD="${USE_MOLD:-}"
+
 export USE_LTO="${USE_LTO:-}"
 
 if [ "${USE_LTO}" = 'ON' ]
@@ -133,6 +135,11 @@ do
 	if [ -n "${USE_ICECC}" ]
 	then
 		cmake_args+=(-D'USE_ICECC'="${USE_ICECC}")
+	fi
+
+	if [ -n "${USE_MOLD}" ]
+	then
+		cmake_args+=(-D'USE_MOLD'="${USE_MOLD}")
 	fi
 
 	if [ -n "${USE_LTO}" ]

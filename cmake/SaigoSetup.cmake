@@ -59,8 +59,9 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
 	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
-	# Mold doesn't work properly on FreeBSD.
-	if (YOKAI_HOST_SYSTEM_FREEBSD)
+	# Mold doesn't work properly with Clang:
+	#   mold: fatal: -auxiliary may not be used without -shared
+	if (YOKAI_CXX_COMPILER_CLANG_COMPATIBILITY)
 		set(DEFAULT_MOLD OFF)
 	else()
 		set(DEFAULT_MOLD ON)
@@ -95,11 +96,16 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 
 	if (USE_MOLD)
 		set(MOLD_FLAG "-fuse-ld=mold")
+
 		check_linker_flag("C" "LINKER:${MOLD_FLAG}" FUSE_LD_MOLD)
 
 		if (FUSE_LD_MOLD)
-			list(APPEND COMPILER_FLAGS "-Wl,${MOLD_FLAG}")
-			list(APPEND EXE_LINKER_FLAGS "${MOLD_FLAG}")
+			list(APPEND MOLD_COMPILER_FLAGS "-Wl,${MOLD_FLAG}")
+			list(APPEND MOLD_EXE_LINKER_FLAGS "${MOLD_FLAG}")
+
+			# Avoids:
+			# warning: -Wl,-fuse-ld=mold: 'linker' input unused [-Wunused-command-line-argument]
+			list(APPEND MOLD_COMPILER_FLAGS "-Wno-unused-command-line-argument")
 		endif()
 	endif()
 
