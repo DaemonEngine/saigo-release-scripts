@@ -64,8 +64,6 @@ set(ALIAS_BIN_ARCH_NAMES "i686" "arm")
 set(ALIAS_DIR_ARCH_NAMES "arm")
 
 if (BUILD_CLANG)
-	add_custom_target(clang ALL)
-
 	if (USE_LTO)
 		if (NOT MINGW)
 			set(LLVM_LTO "${FLTO_VALUE}")
@@ -312,8 +310,6 @@ addBinutilEnv("RANLIB" "ranlib")
 addBinutilEnv("STRIP" "strip")
 
 if (BUILD_BINUTILS)
-	add_custom_target(binutils ALL)
-
 	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
 	set(BINUTILS_EXE_LINKER_FLAGS)
 

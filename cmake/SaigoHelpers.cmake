@@ -39,6 +39,10 @@ macro(AddGitProject NAME DIR URL TAG)
 		endif()
 	else()
 		option(BUILD_${SLUG} "Build the ${NAME}." ON)
+
+		if (BUILD_${SLUG})
+			add_custom_target("${NAME}" ALL)
+		endif()
 	endif()
 
 	if (SHARED_REPOSITORIES_DIR)
