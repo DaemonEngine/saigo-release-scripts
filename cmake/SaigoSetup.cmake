@@ -57,28 +57,6 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "${CMAKE_BUILD_TYPE_HELP}" FORCE)
 	set(CONFIGURE_COMPILER_FLAGS "-O3")
 
-	macro(FindTool SLUG FILE NAME ENABLEMENT)
-		set("DEFAULT_${SLUG}" "${ENABLEMENT}")
-
-		find_program(PATH_${SLUG} NAMES "${FILE}")
-
-		if (NOT PATH_${SLUG})
-			set("DEFAULT_${SLUG}" OFF)
-		endif()
-
-		option("USE_${SLUG}" "Enable ${NAME} when possible." "${DEFAULT_${SLUG}}")
-
-		if (PATH_${SLUG})
-			if (USE_${SLUG})
-				message(STATUS "${NAME} available and used")
-			else()
-				message(STATUS "${NAME} available but not used")
-			endif()
-		else()
-			message(STATUS "${NAME} not available")
-		endif()
-	endmacro()
-
 	# Mold doesn't work properly on FreeBSD.
 	if (YOKAI_HOST_SYSTEM_FREEBSD)
 		set(DEFAULT_MOLD OFF)
@@ -191,34 +169,14 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
 	set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
 
-	macro(AddConfigureEnv NAME VALUE)
-		list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
-	endmacro()
-
 	AddConfigureEnv("CC" "${EP_COMPILER_LAUNCHER} ${EP_C_COMPILER}")
 	AddConfigureEnv("CXX" "${EP_COMPILER_LAUNCHER} ${EP_CXX_COMPILER}")
-
-	macro(AddConfigureTripleEnv NAME PATH)
-		find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
-
-		if (PATH_TRIPLE_${NAME})
-			set(TRIPLE_${NAME} "${PATH_TRIPLE_${NAME}}")
-		else()
-			set(TRIPLE_${NAME} "${PATH}")
-		endif()
-
-		AddConfigureEnv("${NAME}" "${PATH_TRIPLE_${NAME}}")
-	endmacro()
 
 	AddConfigureTripleEnv("AR" "ar")
 	AddConfigureTripleEnv("NM" "nm")
 	AddConfigureTripleEnv("OBJDUMP" "objdump")
 	AddConfigureTripleEnv("RANLIB" "ranlib")
 	AddConfigureTripleEnv("STRIP" "strip")
-
-	macro(ListToString NAME)
-		list(JOIN ${NAME} " " ${NAME}_STRING)
-	endmacro()
 
 	ListToString("EP_C_FLAGS")
 	ListToString("EP_CXX_FLAGS")

@@ -1,3 +1,29 @@
+macro(FindTool SLUG FILE NAME ENABLEMENT)
+	set("DEFAULT_${SLUG}" "${ENABLEMENT}")
+
+	find_program(PATH_${SLUG} NAMES "${FILE}")
+
+	if (NOT PATH_${SLUG})
+		set("DEFAULT_${SLUG}" OFF)
+	endif()
+
+	option("USE_${SLUG}" "Enable ${NAME} when possible." "${DEFAULT_${SLUG}}")
+
+	if (PATH_${SLUG})
+		if (USE_${SLUG})
+			message(STATUS "${NAME} available and used")
+		else()
+			message(STATUS "${NAME} available but not used")
+		endif()
+	else()
+		message(STATUS "${NAME} not available")
+	endif()
+endmacro()
+
+macro(ListToString NAME)
+	list(JOIN ${NAME} " " ${NAME}_STRING)
+endmacro()
+
 macro(AddGitProject NAME DIR URL TAG)
 	string(TOUPPER "${NAME}" SLUG)
 	string(REPLACE "-" "_" SLUG "${SLUG}")
@@ -305,6 +331,22 @@ macro(AddCCompilerFlags NAME)
 			list(APPEND ${NAME}_C_FLAGS "${FLAG}")
 		endif()
 	endforeach()
+endmacro()
+
+macro(AddConfigureEnv NAME VALUE)
+	list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
+endmacro()
+
+macro(AddConfigureTripleEnv NAME PATH)
+	find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
+
+	if (PATH_TRIPLE_${NAME})
+		set(TRIPLE_${NAME} "${PATH_TRIPLE_${NAME}}")
+	else()
+		set(TRIPLE_${NAME} "${PATH}")
+	endif()
+
+	AddConfigureEnv("${NAME}" "${PATH_TRIPLE_${NAME}}")
 endmacro()
 
 macro(EnableConfigureLTO NAME)

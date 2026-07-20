@@ -26,8 +26,8 @@ project(SaigoNativeClientToolchain LANGUAGES NONE)
 
 include(ExternalProject)
 
-include(SaigoSetup)
 include(SaigoHelpers)
+include(SaigoSetup)
 
 # Some generated files (libraries) will get this strings,
 # we don't control it, but we need to know it before hand.
