@@ -305,7 +305,7 @@ if (BUILD_BINUTILS)
 	if (USE_LTO)
 		list(APPEND BINUTILS_C_FLAGS ${LTO_FLAGS})
 
-		if (MINGW)
+		if (YOKAI_C_COMPILER_MINGW)
 			list(APPEND BINUTILS_C_FLAGS "-Dffs=__builtin_ffs")
 		endif()
 
