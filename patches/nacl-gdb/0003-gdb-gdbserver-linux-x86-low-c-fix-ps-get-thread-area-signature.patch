@@ -1,0 +1,39 @@
+From fa797a0993ebfdad17b7291ed93454e1b72949db Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Sun, 19 Jul 2026 00:00:58 +0200
+Subject: [PATCH] gdb/gdbserver/linux-x86-low.c: fix ps_get_thread_area()
+ signature
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix:
+
+linux-x86-low.c:219:1: error: conflicting types for ‘ps_get_thread_area’; have ‘ps_err_e(const struct ps_prochandle *, lwpid_t,  int,  void **)’ {aka ‘ps_err_e(const struct ps_prochandle *, int,  int,  void **)’}
+  219 | ps_get_thread_area (const struct ps_prochandle *ph,
+      | ^~~~~~~~~~~~~~~~~~
+In file included from gdb_proc_service.h:25,
+                 from linux-low.h:23,
+                 from linux-x86-low.c:25:
+/usr/include/proc_service.h:72:17: note: previous declaration of ‘ps_get_thread_area’ with type ‘ps_err_e(struct ps_prochandle *, lwpid_t,  int,  void **)’ {aka ‘ps_err_e(struct ps_prochandle *, int,  int,  void **)’}
+   72 | extern ps_err_e ps_get_thread_area (struct ps_prochandle *,
+---
+ gdb/gdbserver/linux-x86-low.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/gdbserver/linux-x86-low.c b/gdb/gdbserver/linux-x86-low.c
+index e8505bf0..ff45d534 100644
+--- a/gdb/gdbserver/linux-x86-low.c
++++ b/gdb/gdbserver/linux-x86-low.c
+@@ -216,7 +216,7 @@ is_64bit_tdesc (void)
+ /* Called by libthread_db.  */
+ 
+ ps_err_e
+-ps_get_thread_area (const struct ps_prochandle *ph,
++ps_get_thread_area (struct ps_prochandle *ph,
+ 		    lwpid_t lwpid, int idx, void **base)
+ {
+ #ifdef __x86_64__
+-- 
+2.43.0
+

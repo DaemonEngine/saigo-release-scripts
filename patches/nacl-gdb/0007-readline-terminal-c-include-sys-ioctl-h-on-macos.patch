@@ -1,0 +1,27 @@
+From e0c67a6d03f85146ca48e7570b297cfac4817bdf Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Tue, 21 Jul 2026 16:19:56 +0200
+Subject: [PATCH] readline/terminal.c: include sys/ioctl.h on macOS
+
+---
+ readline/terminal.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/readline/terminal.c b/readline/terminal.c
+index 8094186b..3eb62abd 100644
+--- a/readline/terminal.c
++++ b/readline/terminal.c
+@@ -25,6 +25,10 @@
+ #  include <config.h>
+ #endif
+ 
++#if defined(__APPLE__)
++#include <sys/ioctl.h>
++#endif
++
+ #include <sys/types.h>
+ #include "posixstat.h"
+ #include <fcntl.h>
+-- 
+2.43.0
+

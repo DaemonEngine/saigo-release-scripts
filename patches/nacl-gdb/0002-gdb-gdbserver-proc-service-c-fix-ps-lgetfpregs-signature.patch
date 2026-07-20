@@ -1,0 +1,40 @@
+From e8a573fe095e9e0937ea6d735b287973da7f58ac Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Sat, 18 Jul 2026 23:59:27 +0200
+Subject: [PATCH] gdb/gdbserver/proc-service.c: fix ps_lgetfpregs()
+ signature
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix:
+
+proc-service.c:138:1: error: conflicting types for ‘ps_lgetfpregs’; have ‘ps_err_e(struct ps_prochandle *, lwpid_t,  void *)’ {aka ‘ps_err_e(struct ps_prochandle *, int,  void *)’}
+  138 | ps_lgetfpregs (gdb_ps_prochandle_t ph, lwpid_t lwpid, void *fpregset)
+      | ^~~~~~~~~~~~~
+In file included from gdb_proc_service.h:25,
+                 from linux-low.h:23,
+                 from proc-service.c:27:
+/usr/include/proc_service.h:61:17: note: previous declaration of ‘ps_lgetfpregs’ with type ‘ps_err_e(struct ps_prochandle *, lwpid_t,  prfpregset_t *)’ {aka ‘ps_err_e(struct ps_prochandle *, int,  prfpregset_t *)’}
+   61 | extern ps_err_e ps_lgetfpregs (struct ps_prochandle *,
+      |                 ^~~~~~~~~~~~~
+---
+ gdb/gdbserver/proc-service.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/gdbserver/proc-service.c b/gdb/gdbserver/proc-service.c
+index 69b86f8b..9cddd7c4 100644
+--- a/gdb/gdbserver/proc-service.c
++++ b/gdb/gdbserver/proc-service.c
+@@ -135,7 +135,7 @@ ps_lsetregs (gdb_ps_prochandle_t ph, lwpid_t lwpid, const prgregset_t gregset)
+    process PH and store them in FPREGSET.  */
+ 
+ ps_err_e
+-ps_lgetfpregs (gdb_ps_prochandle_t ph, lwpid_t lwpid, void *fpregset)
++ps_lgetfpregs (gdb_ps_prochandle_t ph, lwpid_t lwpid, prfpregset_t *fpregset)
+ {
+   /* Unneeded.  */
+   return PS_ERR;
+-- 
+2.43.0
+

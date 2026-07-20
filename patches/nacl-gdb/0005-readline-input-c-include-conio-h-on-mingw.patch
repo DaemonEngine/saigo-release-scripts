@@ -1,0 +1,27 @@
+From 622d00094b887193fdf5dcca4837f6e6381fe782 Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Mon, 20 Jul 2026 22:07:41 +0200
+Subject: [PATCH] readline/input.c: include conio.h on MinGW
+
+---
+ readline/input.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/readline/input.c b/readline/input.c
+index 7c74c995..e83ae55d 100644
+--- a/readline/input.c
++++ b/readline/input.c
+@@ -21,6 +21,10 @@
+ 
+ #define READLINE_LIBRARY
+ 
++#if defined (__MINGW32__)
++#include <conio.h>
++#endif
++
+ #if defined (__TANDEM)
+ #  include <floss.h>
+ #endif
+-- 
+2.43.0
+

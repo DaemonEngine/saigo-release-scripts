@@ -1,0 +1,37 @@
+From f8c0bdb22550ca6dd204f525a3e6fa79f842f6f8 Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Sat, 18 Jul 2026 23:29:57 +0200
+Subject: [PATCH] gdb/amd64-linux-nat.c: fix ps_get_thread_area() signature
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix:
+
+amd64-linux-nat.c:487:1: error: conflicting types for ‘ps_get_thread_area’; have ‘ps_err_e(const struct ps_prochandle *, lwpid_t,  int,  void **)’ {aka ‘ps_err_e(const struct ps_prochandle *, int,  int,  void **)’}
+  487 | ps_get_thread_area (const struct ps_prochandle *ph,
+      | ^~~~~~~~~~~~~~~~~~
+
+/usr/include/proc_service.h:72:17: note: previous declaration of ‘ps_get_thread_area’ with type ‘ps_err_e(struct ps_prochandle *, lwpid_t,  int,  void **)’ {aka ‘ps_err_e(struct ps_prochandle *, int,  int,  void **)’}
+   72 | extern ps_err_e ps_get_thread_area (struct ps_prochandle *,
+      |                 ^~~~~~~~~~~~~~~~~~
+---
+ gdb/amd64-linux-nat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/amd64-linux-nat.c b/gdb/amd64-linux-nat.c
+index b1676ac3..4228809f 100644
+--- a/gdb/amd64-linux-nat.c
++++ b/gdb/amd64-linux-nat.c
+@@ -484,7 +484,7 @@ amd64_linux_new_fork (struct lwp_info *parent, pid_t child_pid)
+    a request for a thread's local storage address.  */
+ 
+ ps_err_e
+-ps_get_thread_area (const struct ps_prochandle *ph,
++ps_get_thread_area (struct ps_prochandle *ph,
+                     lwpid_t lwpid, int idx, void **base)
+ {
+   if (gdbarch_bfd_arch_info (target_gdbarch ())->bits_per_word == 32)
+-- 
+2.43.0
+

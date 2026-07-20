@@ -50,6 +50,21 @@ AddGitProject("binutils"
 	"0004-ld-makefile-in-do-not-build-libldtestplug-la-testplug-lo.patch"
 )
 
+AddGitProject("gdb"
+	"nacl-gdb"
+	"https://chromium.googlesource.com/native_client/nacl-gdb"
+	"ef0bd30c46a9066309396c37b10a8ff9a726faf3"
+	"${PATCHES_DIR}/binutils/0002-config-sub-enable-riscv64-and-loong64.patch"
+	"${PATCHES_DIR}/binutils/0003-libiberty-waitpid-c-only-compile-waitpid-when-have-waitpid.patch"
+	"0001-gdb-amd64-linux-nat-c-fix-ps-get-thread-area-signature.patch"
+	"0002-gdb-gdbserver-proc-service-c-fix-ps-lgetfpregs-signature.patch"
+	"0003-gdb-gdbserver-linux-x86-low-c-fix-ps-get-thread-area-signature.patch"
+	"0004-gdb-gdbserver-proc-service-c-fix-ps-lsetfpregs-signature.patch"
+	"0005-readline-input-c-include-conio-h-on-mingw.patch"
+	"0006-readline-rltty-c-include-sys-ioctl-h-on-macos.patch"
+	"0007-readline-terminal-c-include-sys-ioctl-h-on-macos.patch"
+)
+
 AddGitProject("nacl"
 	"native_client"
 	"https://github.com/DaemonEngine/native_client.git"
@@ -397,6 +412,109 @@ if (BUILD_BINUTILS)
 	)
 
 	DeleteUselessFiles(binutils "${binutilsUselessFiles}")
+endif()
+
+if (BUILD_GDB)
+	list(APPEND GDB_C_FLAGS ${EP_C_FLAGS})
+	list(APPEND GDB_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
+
+	AddCompilerFlags("GDB" "C"
+		"-fcommon"
+	)
+
+	EnableConfigureLTO("GDB")
+
+	AddCompilerDefinitions("GDB" "-D_GNU_SOURCE")
+
+	AddCompilerConfigureEnv("GDB" "C")
+
+	list(APPEND GDB_ENV ${CONFIGURE_ENV} ${BUILD_ENV})
+
+	AddTargetConfigureArgs("GDB")
+
+	list(APPEND GDB_ARGS ${CONFIGURE_ARGS})
+
+	# There is no working install-strip target.
+	# The gdbserver cannot be built when nacl targets are set.
+	ExternalProject_Add(gdb-binaries
+		${EP_OPTIONS_GDB}
+		CONFIGURE_COMMAND
+			"${SOURCE_DIR_GDB}/configure"
+				${GDB_ENV}
+				${GDB_ARGS}
+				--disable-gdbserver
+				--without-python
+				--disable-sim
+		BUILD_COMMAND
+			$(MAKE)
+				${GDB_ENV}
+		INSTALL_COMMAND
+			$(MAKE)
+				${GDB_ENV}
+				"DESTDIR=${CMAKE_INSTALL_PREFIX}"
+				install
+			&& "${TRIPLE_STRIP}" "${CMAKE_INSTALL_PREFIX}/bin/x86_64-nacl-gdb${CMAKE_EXECUTABLE_SUFFIX}"
+	)
+
+	add_dependencies(gdb gdb-binaries)
+
+	list(APPEND gdbToolNames
+		"gdb"
+	)
+
+	AddBinaryAliases(gdb "${gdbToolNames}")
+
+	set(gdbUselessFiles
+		"include/gdb/jit-reader.h"
+		"share/gdb/python/gdb/command/bound_registers.py"
+		"share/gdb/python/gdb/command/explore.py"
+		"share/gdb/python/gdb/command/frame_filters.py"
+		"share/gdb/python/gdb/command/__init__.py"
+		"share/gdb/python/gdb/command/pretty_printers.py"
+		"share/gdb/python/gdb/command/prompt.py"
+		"share/gdb/python/gdb/command/type_printers.py"
+		"share/gdb/python/gdb/FrameDecorator.py"
+		"share/gdb/python/gdb/FrameIterator.py"
+		"share/gdb/python/gdb/frames.py"
+		"share/gdb/python/gdb/function/__init__.py"
+		"share/gdb/python/gdb/function/strfns.py"
+		"share/gdb/python/gdb/__init__.py"
+		"share/gdb/python/gdb/printing.py"
+		"share/gdb/python/gdb/prompt.py"
+		"share/gdb/python/gdb/types.py"
+		"share/gdb/syscalls/amd64-linux.xml"
+		"share/gdb/syscalls/arm-linux.xml"
+		"share/gdb/syscalls/gdb-syscalls.dtd"
+		"share/gdb/syscalls/i386-linux.xml"
+		"share/gdb/syscalls/mips-n32-linux.xml"
+		"share/gdb/syscalls/mips-n64-linux.xml"
+		"share/gdb/syscalls/mips-o32-linux.xml"
+		"share/gdb/syscalls/ppc64-linux.xml"
+		"share/gdb/syscalls/ppc-linux.xml"
+		"share/gdb/syscalls/sparc64-linux.xml"
+		"share/gdb/syscalls/sparc-linux.xml"
+		"share/gdb/system-gdbinit/elinos.py"
+		"share/gdb/system-gdbinit/wrs-linux.py"
+		"share/info/dir"
+		"share/info/annotate.info"
+		"share/info/bfd.info"
+		"share/info/configure.info"
+		"share/info/gdb.info"
+		"share/info/gdb.info-1"
+		"share/info/gdb.info-2"
+		"share/info/gdb.info-3"
+		"share/info/gdb.info-4"
+		"share/info/gdb.info-5"
+		"share/info/gdb.info-6"
+		"share/info/gdb.info-7"
+		"share/info/stabs.info"
+		"share/info/standards.info"
+		"share/man/man1/gdb.1"
+		"share/man/man1/gdbserver.1"
+		"share/man/man5/gdbinit.5"
+	)
+
+	DeleteUselessFiles(gdb "${gdbUselessFiles}")
 endif()
 
 if (BUILD_NACL)

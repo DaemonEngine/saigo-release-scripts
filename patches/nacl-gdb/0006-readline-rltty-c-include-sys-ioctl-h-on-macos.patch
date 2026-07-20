@@ -1,0 +1,27 @@
+From 885268ec7f2a0afbf36ea427a6ac9195f50f2306 Mon Sep 17 00:00:00 2001
+From: Thomas Debesse <dev@illwieckz.net>
+Date: Tue, 21 Jul 2026 16:13:12 +0200
+Subject: [PATCH] readline/rltty.c: include sys/ioctl.h on macOS
+
+---
+ readline/rltty.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/readline/rltty.c b/readline/rltty.c
+index d237b1c0..b0a1db09 100644
+--- a/readline/rltty.c
++++ b/readline/rltty.c
+@@ -26,6 +26,10 @@
+ #  include <config.h>
+ #endif
+ 
++#if defined(__APPLE__)
++#include <sys/ioctl.h>
++#endif
++
+ #include <sys/types.h>
+ #include <signal.h>
+ #include <errno.h>
+-- 
+2.43.0
+
