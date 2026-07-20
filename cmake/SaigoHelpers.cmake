@@ -1,5 +1,6 @@
 macro(AddGitProject NAME DIR URL TAG)
 	string(TOUPPER "${NAME}" SLUG)
+	string(REPLACE "-" "_" SLUG "${SLUG}")
 	set(GIT_REPOSITORY_${SLUG} "${URL}" CACHE STRING "${NAME} git repository location.")
 	mark_as_advanced(GIT_REPOSITORY_${SLUG})
 
