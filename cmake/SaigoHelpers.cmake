@@ -343,11 +343,17 @@ macro(AddCompilerDefinitions NAME)
 	endforeach()
 endmacro()
 
-macro(AddConfigureEnv NAME VALUE)
-	list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
+macro(AddConfigureEnv NAME)
+	foreach(VAR IN ITEMS ${ARGN})
+		list(APPEND ${NAME}_ENV "${VAR}")
+	endforeach()
 endmacro()
 
-macro(AddTripleConfigureEnv NAME PATH)
+macro(AddToolConfigureEnv NAME VALUE)
+	AddConfigureEnv("CONFIGURE" "${NAME}=${VALUE}")
+endmacro()
+
+macro(AddTripleToolConfigureEnv NAME PATH)
 	find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
 
 	if (PATH_TRIPLE_${NAME})
@@ -356,7 +362,7 @@ macro(AddTripleConfigureEnv NAME PATH)
 		set(TRIPLE_${NAME} "${PATH}")
 	endif()
 
-	AddConfigureEnv("${NAME}" "${TRIPLE_${NAME}}")
+	AddToolConfigureEnv("${NAME}" "${TRIPLE_${NAME}}")
 endmacro()
 
 macro(EnableConfigureLTO NAME)
@@ -369,12 +375,6 @@ macro(EnableConfigureLTO NAME)
 
 		list(APPEND ${NAME}_EXE_LINKER_FLAGS ${${NAME}_CFLAGS})
 	endif()
-endmacro()
-
-macro(AddConfigureEnv NAME)
-	foreach(VAR IN ITEMS ${ARGN})
-		list(APPEND ${NAME}_ENV "${VAR}")
-	endforeach()
 endmacro()
 
 macro(AddCompilerConfigureEnv NAME LANGS)
