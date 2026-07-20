@@ -29,7 +29,7 @@ include(ExternalProject)
 include(SaigoHelpers)
 include(SaigoSetup)
 
-# Some generated files (libraries) will get this strings,
+# Some generated files will have this string in their name,
 # we don't control it, but we need to know it before hand.
 set(SAIGO_CLANG_VERSION "21")
 
