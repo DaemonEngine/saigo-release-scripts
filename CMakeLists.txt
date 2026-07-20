@@ -295,12 +295,12 @@ if (BUILD_BINUTILS)
 	list(APPEND BINUTILS_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
 
 	AddCCompilerFlags("BINUTILS"
-		"-Wno-absolute-value"
-		"-Wno-unused-function"
-		"-Wno-unused-const-variable"
-		"-Wno-unneeded-internal-declaration"
-		"-Wno-unused-private-field"
-		"-Wno-format-security"
+		"-Wno-error=absolute-value"
+		"-Wno-error=format-security"
+		"-Wno-error=unneeded-internal-declaration"
+		"-Wno-error=unused-const-variable"
+		"-Wno-error=unused-function"
+		"-Wno-error=unused-private-field"
 	)
 
 	EnableConfigureLTO("BINUTILS")
