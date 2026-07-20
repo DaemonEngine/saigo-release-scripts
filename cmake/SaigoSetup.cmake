@@ -181,4 +181,16 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 
 	addConfigureEnv("CC" "${EP_COMPILER_LAUNCHER} ${EP_C_COMPILER}")
 	addConfigureEnv("CXX" "${EP_COMPILER_LAUNCHER} ${EP_CXX_COMPILER}")
+
+	macro(addConfigureTripleEnv NAME PATH)
+		find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
+
+		if (PATH_TRIPLE_${NAME})
+			set(TRIPLE_${NAME} "${PATH_TRIPLE_${NAME}}")
+		else()
+			set(TRIPLE_PATH "${PATH}")
+		endif()
+
+		addConfigureEnv("${NAME}" "${TRIPLE_PATH}")
+	endmacro()
 endif()

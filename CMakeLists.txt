@@ -290,24 +290,13 @@ if (BUILD_CLANG)
 	DeleteUselessFiles(clang "${clangUselessFiles}")
 endif()
 
-macro(addBinutilsEnv NAME PATH)
-	set(TRIPLE_${NAME} "${TRIPLE_HOST}-${PATH}")
-
-	find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_${NAME}}")
-
-	if (PATH_TRIPLE_${NAME})
-		set(BINUTILS_${NAME} "${TRIPLE_${NAME}}")
-	else ()
-		set(BINUTILS_${NAME} "${PATH}")
-		addConfigureEnv("${NAME}" "${PATH}")
-	endif()
-endmacro()
-
-addBinutilsEnv("AR" "ar")
-addBinutilsEnv("NM" "nm")
-addBinutilsEnv("OBJDUMP" "objdump")
-addBinutilsEnv("RANLIB" "ranlib")
-addBinutilsEnv("STRIP" "strip")
+if (NOT CLONE_SHARED_REPOSITORIES)
+	addConfigureTripleEnv("AR" "ar")
+	addConfigureTripleEnv("NM" "nm")
+	addConfigureTripleEnv("OBJDUMP" "objdump")
+	addConfigureTripleEnv("RANLIB" "ranlib")
+	addConfigureTripleEnv("STRIP" "strip")
+endif()
 
 if (BUILD_BINUTILS)
 	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
@@ -328,7 +317,7 @@ if (BUILD_BINUTILS)
 		"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${BINUTILS_EXE_LINKER_FLAGS}"
 		"CC_FOR_BUILD=cc"
 		"MAKEINFO=true"
-		"STRIPPROG=${BINUTILS_STRIP}"
+		"STRIPPROG=${TRIPLE_STRIP}"
 	)
 
 	ExternalProject_Add(binutils-binaries
