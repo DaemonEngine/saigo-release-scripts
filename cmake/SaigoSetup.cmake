@@ -175,24 +175,30 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	set(EP_C_COMPILER "${CMAKE_C_COMPILER}")
 	set(EP_CXX_COMPILER "${CMAKE_CXX_COMPILER}")
 
-	macro(addConfigureEnv NAME VALUE)
+	macro(AddConfigureEnv NAME VALUE)
 		list(APPEND CONFIGURE_ENV "${NAME}=${VALUE}")
 	endmacro()
 
-	addConfigureEnv("CC" "${EP_COMPILER_LAUNCHER} ${EP_C_COMPILER}")
-	addConfigureEnv("CXX" "${EP_COMPILER_LAUNCHER} ${EP_CXX_COMPILER}")
+	AddConfigureEnv("CC" "${EP_COMPILER_LAUNCHER} ${EP_C_COMPILER}")
+	AddConfigureEnv("CXX" "${EP_COMPILER_LAUNCHER} ${EP_CXX_COMPILER}")
 
-	macro(addConfigureTripleEnv NAME PATH)
+	macro(AddConfigureTripleEnv NAME PATH)
 		find_program(PATH_TRIPLE_${NAME} NAMES "${TRIPLE_HOST}-${PATH}")
 
 		if (PATH_TRIPLE_${NAME})
 			set(TRIPLE_${NAME} "${PATH_TRIPLE_${NAME}}")
 		else()
-			set(TRIPLE_PATH "${PATH}")
+			set(TRIPLE_${NAME} "${PATH}")
 		endif()
 
-		addConfigureEnv("${NAME}" "${TRIPLE_PATH}")
+		AddConfigureEnv("${NAME}" "${PATH_TRIPLE_${NAME}}")
 	endmacro()
+
+	AddConfigureTripleEnv("AR" "ar")
+	AddConfigureTripleEnv("NM" "nm")
+	AddConfigureTripleEnv("OBJDUMP" "objdump")
+	AddConfigureTripleEnv("RANLIB" "ranlib")
+	AddConfigureTripleEnv("STRIP" "strip")
 
 	macro(listToString NAME)
 		list(JOIN ${NAME} " " ${NAME}_STRING)
