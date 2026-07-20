@@ -86,11 +86,11 @@ if (BUILD_CLANG)
 			"-DCMAKE_INSTALL_RPATH=${INSTALL_RPATH}"
 			"-DCMAKE_C_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
 			"-DCMAKE_C_COMPILER=${EP_C_COMPILER}"
-			"-DCMAKE_C_FLAGS=${EP_C_FLAGS}"
+			"-DCMAKE_C_FLAGS=${EP_C_FLAGS_STRING}"
 			"-DCMAKE_CXX_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
 			"-DCMAKE_CXX_COMPILER=${EP_CXX_COMPILER}"
-			"-DCMAKE_CXX_FLAGS=${EP_CXX_FLAGS}"
-			"-DCMAKE_EXE_LINKER_FLAGS=${EP_EXE_LINKER_FLAGS}"
+			"-DCMAKE_CXX_FLAGS=${EP_CXX_FLAGS_STRINGS}"
+			"-DCMAKE_EXE_LINKER_FLAGS=${EP_EXE_LINKER_FLAGS_STRING}"
 
 			"-DLLVM_TARGETS_TO_BUILD=X86|ARM"
 			"-DLLVM_DEFAULT_TARGET_TRIPLE=${TRIPLE_TARGET}"
@@ -299,22 +299,34 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 endif()
 
 if (BUILD_BINUTILS)
-	set(BINUTILS_C_FLAGS "-Wno-absolute-value -Wno-unused-function -Wno-unused-const-variable -Wno-unneeded-internal-declaration -Wno-unused-private-field -Wno-format-security")
-	set(BINUTILS_EXE_LINKER_FLAGS)
+	list(APPEND BINUTILS_C_FLAGS ${EP_C_FLAGS})
+	list(APPEND BINUTILS_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
 
 	if (USE_LTO)
-		string(APPEND BINUTILS_C_FLAGS " ${LTO_FLAGS}")
+		list(APPEND BINUTILS_C_FLAGS ${LTO_FLAGS})
 
 		if (MINGW)
-			string(APPEND BINUTILS_C_FLAGS " -Dffs=__builtin_ffs")
+			list(APPEND BINUTILS_C_FLAGS "-Dffs=__builtin_ffs")
 		endif()
 
-		string(APPEND BINUTILS_EXE_LINKER_FLAGS " ${BINUTILS_CFLAGS}")
+		list(APPEND BINUTILS_EXE_LINKER_FLAGS ${BINUTILS_CFLAGS})
 	endif()
 
+	addCCompilerFlags("BINUTILS"
+		"-Wno-absolute-value"
+		"-Wno-unused-function"
+		"-Wno-unused-const-variable"
+		"-Wno-unneeded-internal-declaration"
+		"-Wno-unused-private-field"
+		"-Wno-format-security"
+	)
+
+	listToString("BINUTILS_C_FLAGS")
+	listToString("BINUTILS_EXE_LINKER_FLAGS")
+
 	list(APPEND BINUTILS_ENV
-		"CFLAGS=${EP_C_FLAGS} ${BINUTILS_C_FLAGS}"
-		"LDFLAGS=${EP_EXE_LINKER_FLAGS} ${BINUTILS_EXE_LINKER_FLAGS}"
+		"CFLAGS=${BINUTILS_C_FLAGS_STRING}"
+		"LDFLAGS=${BINUTILS_EXE_LINKER_FLAGS_STRING}"
 		"CC_FOR_BUILD=cc"
 		"MAKEINFO=true"
 		"STRIPPROG=${TRIPLE_STRIP}"

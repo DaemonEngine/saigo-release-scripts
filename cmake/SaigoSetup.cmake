@@ -117,14 +117,14 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		check_linker_flag("C" "LINKER:${MOLD_FLAG}" FUSE_LD_MOLD)
 
 		if (FUSE_LD_MOLD)
-			set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wl,${MOLD_FLAG}")
-			set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${MOLD_FLAG}")
+			list(APPEND COMPILER_FLAGS "-Wl,${MOLD_FLAG}")
+			list(APPEND EXE_LINKER_FLAGS "${MOLD_FLAG}")
 		endif()
 	endif()
 
 	if (YOKAI_TARGET_SYSTEM_MACOS)
 		if (NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-			set(COMPILER_FLAGS "${COMPILER_FLAGS} -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+			list(APPEND COMPILER_FLAGS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		endif()
 	endif()
 
@@ -143,22 +143,22 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 			set(FLTO_VALUE "auto")
 		endif()
 
-		set(LTO_FLAGS "-flto=${FLTO_VALUE} -fno-fat-lto-objects")
+		list(APPEND LTO_FLAGS "-flto=${FLTO_VALUE}" "-fno-fat-lto-objects")
 
 		# FreeBSD and macOS clang don't support -fno-fat-lto-objects.
-		string(APPEND LTO_FLAGS " -Wno-ignored-optimization-argument")
+		list(APPEND LTO_FLAGS "-Wno-ignored-optimization-argument")
 
-		set(EXE_LINKER_FLAGS "${EXE_LINKER_FLAGS} ${COMPILER_FLAGS}")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_C_FLAGS}")
+		list(APPEND EXE_LINKER_FLAGS ${COMPILER_FLAGS})
+		list(APPEND CMAKE_EXE_LINKER_FLAGS ${CMAKE_C_FLAGS})
 	endif()
 
 	if (YOKAI_CXX_COMPILER_MINGW)
-		string(APPEND EXE_LINKER_FLAGS " -static -static-libstdc++ -static-libgcc")
+		list(APPEND EXE_LINKER_FLAGS "-static" "-static-libstdc++" "-static-libgcc")
 	endif()
 
-	set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILER_FLAGS}")
-	set(EP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
-	set(EP_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS}")
+	list(APPEND EP_C_FLAGS ${CMAKE_C_FLAGS} ${COMPILER_FLAGS})
+	list(APPEND EP_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS})
+	list(APPEND EP_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS})
 
 	if (CMAKE_OSX_DEPLOYMENT_TARGET)
 		list(APPEND EP_CMAKE_ARGS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
@@ -193,4 +193,13 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 
 		addConfigureEnv("${NAME}" "${TRIPLE_PATH}")
 	endmacro()
+
+	macro(listToString NAME)
+		string(REPLACE ";" " " ${NAME}_STRING "${NAME}")
+	endmacro()
+
+	listToString(EP_C_FLAGS)
+	listToString(EP_CXX_FLAGS)
+	listToString(EP_EXE_LINKER_FLAGS)
+	listToString(LTO_FLAGS)
 endif()
