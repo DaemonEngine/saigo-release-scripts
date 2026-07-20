@@ -294,7 +294,7 @@ if (BUILD_BINUTILS)
 	list(APPEND BINUTILS_C_FLAGS ${EP_C_FLAGS})
 	list(APPEND BINUTILS_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
 
-	AddCCompilerFlags("BINUTILS"
+	AddCompilerFlags("BINUTILS" "C"
 		"-Wno-error=absolute-value"
 		"-Wno-error=format-security"
 		"-Wno-error=unneeded-internal-declaration"
@@ -308,11 +308,10 @@ if (BUILD_BINUTILS)
 	ListToString("BINUTILS_C_FLAGS")
 	ListToString("BINUTILS_EXE_LINKER_FLAGS")
 
-	list(APPEND BINUTILS_ENV
-		"CFLAGS=${BINUTILS_C_FLAGS_STRING}"
-		"LDFLAGS=${BINUTILS_EXE_LINKER_FLAGS_STRING}"
+	AddCompilerConfigureEnv("BINUTILS" "C")
+
+	AddConfigureEnv("BINUTILS"
 		"CC_FOR_BUILD=cc"
-		"MAKEINFO=true"
 		"STRIPPROG=${TRIPLE_STRIP}"
 	)
 

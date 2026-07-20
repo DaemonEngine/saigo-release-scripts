@@ -319,17 +319,27 @@ function(DeleteUselessFiles targetName filePaths)
 	add_dependencies(${targetName} ${deletesName})
 endfunction()
 
-macro(AddCCompilerFlags NAME)
+macro(AddCompilerFlags NAME LANGS)
+	foreach(LANG IN ITEMS ${LANGS})
+		foreach(FLAG IN ITEMS ${ARGN})
+			string(TOUPPER "FLAG_${FLAG}" FLAG_SLUG)
+			string(REGEX REPLACE "[^A-Z0-9]" "_" FLAG_SLUG "${FLAG_SLUG}")
+			string(REGEX REPLACE "_+" "_" FLAG_SLUG "${FLAG_SLUG}")
+
+			if ("${${FLAG_SLUG}}" STREQUAL "")
+				check_compiler_flag("${LANG}" "${FLAG}" ${FLAG_SLUG})
+			endif()
+
+			if (${FLAG_SLUG})
+				list(APPEND ${NAME}_${LANG}_FLAGS "${FLAG}")
+			endif()
+		endforeach()
+	endforeach()
+endmacro()
+
+macro(AddCompilerDefinitions NAME)
 	foreach(FLAG IN ITEMS ${ARGN})
-		string(TOUPPER "FLAG_${FLAG}" FLAG_SLUG)
-		string(REGEX REPLACE "[^A-Z0-9]" "_" FLAG_SLUG "${FLAG_SLUG}")
-		string(REGEX REPLACE "_+" "_" FLAG_SLUG "${FLAG_SLUG}")
-
-		check_C_compiler_flag("${FLAG}" ${FLAG_SLUG})
-
-		if (${FLAG_SLUG})
-			list(APPEND ${NAME}_C_FLAGS "${FLAG}")
-		endif()
+		list(APPEND ${NAME}_DEFINITIONS ${FLAG})
 	endforeach()
 endmacro()
 
@@ -354,9 +364,36 @@ macro(EnableConfigureLTO NAME)
 		list(APPEND ${NAME}_C_FLAGS ${LTO_FLAGS})
 
 		if (YOKAI_C_COMPILER_MINGW)
-			list(APPEND ${NAME}_C_FLAGS "-Dffs=__builtin_ffs")
+			AddCompilerDefinitions("${NAME}" "-Dffs=__builtin_ffs")
 		endif()
 
 		list(APPEND ${NAME}_EXE_LINKER_FLAGS ${${NAME}_CFLAGS})
 	endif()
+endmacro()
+
+macro(AddConfigureEnv NAME)
+	foreach(VAR IN ITEMS ${ARGN})
+		list(APPEND ${NAME}_ENV "${VAR}")
+	endforeach()
+endmacro()
+
+macro(AddCompilerConfigureEnv NAME LANGS)
+	ListToString("${NAME}_DEFINITIONS")
+
+	foreach(LANG IN ITEMS ${LANGS})
+		list(APPEND ${NAME}_${LANG}_FLAGS ${${NAME}_DEFINITIONS})
+
+		ListToString("${NAME}_${LANG}_FLAGS")
+
+		AddConfigureEnv("${NAME}"
+			"CFLAGS=${${NAME}_${LANG}_FLAGS_STRING}"
+		)
+	endforeach()
+
+	ListToString("${NAME}_EXE_LINKER_FLAGS")
+
+	AddConfigureEnv("${NAME}"
+		"LDFLAGS=${${NAME}_EXE_LINKER_FLAGS_STRING}"
+		"MAKEINFO=true"
+	)
 endmacro()

@@ -27,7 +27,7 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	enable_language(C)
 	enable_language(CXX)
 
-	include(CheckCCompilerFlag)
+	include(CheckCompilerFlag)
 	include(CheckLinkerFlag)
 
 	include(Yokai/Detection)
