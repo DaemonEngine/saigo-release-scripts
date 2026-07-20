@@ -27,6 +27,7 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	enable_language(C)
 	enable_language(CXX)
 
+	include(CheckCCompilerFlag)
 	include(CheckLinkerFlag)
 
 	include(Yokai/Detection)
@@ -148,17 +149,32 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		# FreeBSD and macOS clang don't support -fno-fat-lto-objects.
 		list(APPEND LTO_FLAGS "-Wno-ignored-optimization-argument")
 
+		foreach(flag IN ITEMS ${CMAKE_C_FLAGS})
+			list(APPEND EXE_LINKER_FLAGS ${flag})
+		endforeach()
+
 		list(APPEND EXE_LINKER_FLAGS ${COMPILER_FLAGS})
-		list(APPEND CMAKE_EXE_LINKER_FLAGS ${CMAKE_C_FLAGS})
 	endif()
 
 	if (YOKAI_CXX_COMPILER_MINGW)
 		list(APPEND EXE_LINKER_FLAGS "-static" "-static-libstdc++" "-static-libgcc")
 	endif()
 
-	list(APPEND EP_C_FLAGS ${CMAKE_C_FLAGS} ${COMPILER_FLAGS})
-	list(APPEND EP_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS})
-	list(APPEND EP_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${EXE_LINKER_FLAGS})
+	foreach(flag IN ITEMS ${CMAKE_C_FLAGS})
+		list(APPEND EP_C_FLAGS "${flag}")
+	endforeach()
+
+	foreach(flag IN ITEMS ${CMAKE_CXX_FLAGS})
+		list(APPEND EP_CXX_FLAGS "${flag}")
+	endforeach()
+
+	foreach(flag IN ITEMS ${CMAKE_EXE_LINKER_FLAGS})
+		list(APPEND EP_EXE_LINKER_FLAGS "${flag}")
+	endforeach()
+
+	list(APPEND EP_C_FLAGS ${COMPILER_FLAGS})
+	list(APPEND EP_CXX_FLAGS ${COMPILER_FLAGS})
+	list(APPEND EP_EXE_LINKER_FLAGS ${EXE_LINKER_FLAGS})
 
 	if (CMAKE_OSX_DEPLOYMENT_TARGET)
 		list(APPEND EP_CMAKE_ARGS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
@@ -200,12 +216,12 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	AddConfigureTripleEnv("RANLIB" "ranlib")
 	AddConfigureTripleEnv("STRIP" "strip")
 
-	macro(listToString NAME)
+	macro(ListToString NAME)
 		list(JOIN ${NAME} " " ${NAME}_STRING)
 	endmacro()
 
-	listToString("EP_C_FLAGS")
-	listToString("EP_CXX_FLAGS")
-	listToString("EP_EXE_LINKER_FLAGS")
-	listToString("LTO_FLAGS")
+	ListToString("EP_C_FLAGS")
+	ListToString("EP_CXX_FLAGS")
+	ListToString("EP_EXE_LINKER_FLAGS")
+	ListToString("LTO_FLAGS")
 endif()
