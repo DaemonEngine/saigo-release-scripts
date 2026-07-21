@@ -38,13 +38,6 @@ then
 	fi
 fi
 
-export USE_CCACHE="${USE_CCACHE:-}"
-
-if [ "${USE_CCACHE}" = 'ON' ]
-then
-	echo "Using Ccache"
-fi
-
 if [ -z "${USE_ICECC:-}" ]
 then
 	if command -v icecc >/dev/null 2>&1
@@ -53,29 +46,18 @@ then
 	fi
 fi
 
-export USE_ICECC="${USE_ICECC:-}"
-
-if [ "${USE_ICECC}" = 'ON' ]
-then
-	echo "Using IceCC"
-fi
-
-export USE_MOLD="${USE_MOLD:-}"
-
-export USE_LTO="${USE_LTO:-}"
-
-if [ "${USE_LTO}" = 'ON' ]
-then
-	echo "Using LTO"
-fi
-
-if [ "${USE_ICECC}" = 'ON' ]
+if [ "${USE_ICECC:-}" = 'ON' ]
 then
 	echo "Using distributed jobs"
 	export safer_count='999'
 else
 	echo "Using ${safer_count} jobs"
 fi
+
+export USE_ICECC="${USE_ICECC:-}"
+export USE_CCACHE="${USE_CCACHE:-}"
+export USE_MOLD="${USE_MOLD:-}"
+export USE_LTO="${USE_LTO:-}"
 
 export CMAKE_BUILD_PARALLEL_LEVEL="${safer_count}"
 export MAKEFLAGS="-j${safer_count}"
