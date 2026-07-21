@@ -49,7 +49,9 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
 
-	set(TRIPLE_TARGET x86_64-nacl)
+	set(TRIPLE_TARGET "x86_64-nacl")
+
+	set(CONFIGURE_TRIPLE_TARGETS "x86_64-nacl,i686-nacl,arm-nacl")
 
 	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/install" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
@@ -210,8 +212,6 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	list(APPEND CONFIGURE_ARGS
 		"--build=${TRIPLE_BUILD}"
 		"--host=${TRIPLE_HOST}"
-		"--target=${TRIPLE_TARGET}"
-		"--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
 		--prefix=
 		--disable-werror
 		--disable-nls

@@ -395,6 +395,13 @@ macro(AddCompilerConfigureEnv NAME LANGS)
 	AddConfigureEnv("${NAME}" "LDFLAGS=${${NAME}_EXE_LINKER_FLAGS_STRING}")
 endmacro()
 
+macro(AddTargetConfigureArgs NAME)
+	list(APPEND ${NAME}_ARGS
+			"--target=${TRIPLE_TARGET}"
+			"--enable-targets=${CONFIGURE_TRIPLE_TARGETS}"
+	)
+endmacro()
+
 macro(AddCompilerCmakeArgs NAME LANGS)
 	foreach(lang IN ITEMS C CXX)
 		list(APPEND CLANG_${lang}_FLAGS ${EP_${lang}_FLAGS} ${MOLD_COMPILER_FLAGS})

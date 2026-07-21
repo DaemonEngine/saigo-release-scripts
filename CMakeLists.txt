@@ -297,12 +297,16 @@ if (BUILD_BINUTILS)
 
 	list(APPEND BINUTILS_ENV ${CONFIGURE_ENV} ${BUILD_ENV})
 
+	AddTargetConfigureArgs("BINUTILS")
+
+	list(APPEND BINUTILS_ARGS ${CONFIGURE_ARGS})
+
 	ExternalProject_Add(binutils-binaries
 		${EP_OPTIONS_BINUTILS}
 		CONFIGURE_COMMAND
 			"${SOURCE_DIR_BINUTILS}/configure"
 				${BINUTILS_ENV}
-				${CONFIGURE_ARGS}
+				${BINUTILS_ARGS}
 				--disable-gdb
 				--disable-gold
 				--disable-plugins
