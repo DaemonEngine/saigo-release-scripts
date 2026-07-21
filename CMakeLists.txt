@@ -294,15 +294,6 @@ if (BUILD_BINUTILS)
 	list(APPEND BINUTILS_C_FLAGS ${EP_C_FLAGS})
 	list(APPEND BINUTILS_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
 
-	AddCompilerFlags("BINUTILS" "C"
-		"-Wno-error=absolute-value"
-		"-Wno-error=format-security"
-		"-Wno-error=unneeded-internal-declaration"
-		"-Wno-error=unused-const-variable"
-		"-Wno-error=unused-function"
-		"-Wno-error=unused-private-field"
-	)
-
 	EnableConfigureLTO("BINUTILS")
 
 	ListToString("BINUTILS_C_FLAGS")
