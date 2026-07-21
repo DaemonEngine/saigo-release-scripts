@@ -194,4 +194,19 @@ if (NOT CLONE_SHARED_REPOSITORIES)
 	ListToString("EP_CXX_FLAGS")
 	ListToString("EP_EXE_LINKER_FLAGS")
 	ListToString("LTO_FLAGS")
+
+	list(APPEND CONFIGURE_ARGS
+		"--build=${TRIPLE_BUILD}"
+		"--host=${TRIPLE_HOST}"
+		"--target=${TRIPLE_TARGET}"
+		"--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
+		--prefix=
+		--disable-werror
+		--disable-nls
+		--disable-doc
+		--disable-testsuite
+		--disable-maintainer-mode
+		--disable-silent-rules
+		--enable-deterministic-archives
+	)
 endif()

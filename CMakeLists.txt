@@ -308,25 +308,12 @@ if (BUILD_BINUTILS)
 		CONFIGURE_COMMAND
 			"${SOURCE_DIR_BINUTILS}/configure"
 				${BINUTILS_ENV}
-				"--build=${TRIPLE_BUILD}"
-				"--host=${TRIPLE_HOST}"
-				"--target=${TRIPLE_TARGET}"
-				"--enable-targets=x86_64-nacl,i686-nacl,arm-nacl"
-				--prefix=
-				--disable-gold
-				--disable-werror
-				--disable-nls
-				--disable-maintainer-mode
-				--disable-doc
-				--without-man
-				--without-info
-				--without-zlib
-				--disable-silent-rules
+				${CONFIGURE_ARGS}
 				--disable-gdb
+				--disable-gold
 				--disable-plugins
 				--disable-sim
-				--disable-testsuite
-				--enable-deterministic-archives
+				--without-zlib
 		BUILD_COMMAND
 			$(MAKE)
 				${BINUTILS_ENV}
