@@ -392,3 +392,23 @@ macro(AddCompilerConfigureEnv NAME LANGS)
 
 	AddConfigureEnv("${NAME}" "LDFLAGS=${${NAME}_EXE_LINKER_FLAGS_STRING}")
 endmacro()
+
+macro(AddCompilerCmakeArgs NAME LANGS)
+	foreach(lang IN ITEMS C CXX)
+		list(APPEND CLANG_${lang}_FLAGS ${EP_${lang}_FLAGS})
+
+		ListToString(CLANG_${lang}_FLAGS)
+
+		list(APPEND ${NAME}_ARGS 
+			"-DCMAKE_${LANG}_COMPILER_LAUNCHER=${EP_COMPILER_LAUNCHER}"
+			"-DCMAKE_${LANG}_COMPILER=${EP_${LANG}_COMPILER}"
+			"-DCMAKE_${LANG}_FLAGS=${CLANG_${LANG}_FLAGS_STRING}"
+		)
+	endforeach()
+
+	list(APPEND CLANG_EXE_LINKER_FLAGS ${EP_EXE_LINKER_FLAGS})
+
+	ListToString(CLANG_EXE_LINKER_FLAGS)
+
+	list(APPEND ${NAME}_ARGS "-DCMAKE_EXE_LINKER_FLAGS=${CLANG_EXE_LINKER_FLAGS_STRING}")
+endmacro()
