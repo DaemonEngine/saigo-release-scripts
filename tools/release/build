@@ -167,13 +167,21 @@ do
 
 	echo "Configuring ${target_name}"
 
-	cmake -B "${build_dir}" "${cmake_args[@]}"
+	if ! cmake -B "${build_dir}" "${cmake_args[@]}"
+	then
+		echo "Failed to configure ${target_name}" >&2
+		false
+	fi
 
 	case "${DO_BUILD}" in
 	'ON')
 		echo "Building ${target_name}"
 
-		cmake --build "${build_dir}"
+		if ! cmake --build "${build_dir}"
+		then
+			echo "Failed to build ${target_name}" >&2
+			false
+		fi
 
 		find "${build_dir}/install" -type d -exec rmdir {} \; 2>/dev/null || true
 		;;
