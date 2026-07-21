@@ -338,6 +338,7 @@ if (BUILD_BINUTILS)
 				--enable-deterministic-archives
 		BUILD_COMMAND
 			$(MAKE)
+				${CONFIGURE_ENV}
 				${BUILD_ENV}
 				${BINUTILS_ENV}
 		INSTALL_COMMAND
