@@ -54,6 +54,8 @@ else
 	echo "Using ${safer_count} jobs"
 fi
 
+export DO_BUILD="${DO_BUILD:-ON}"
+
 export USE_ICECC="${USE_ICECC:-}"
 export USE_CCACHE="${USE_CCACHE:-}"
 export USE_MOLD="${USE_MOLD:-}"
