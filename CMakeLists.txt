@@ -301,12 +301,12 @@ if (BUILD_BINUTILS)
 
 	AddCompilerConfigureEnv("BINUTILS" "C")
 
+	list(APPEND BINUTILS_ENV ${CONFIGURE_ENV} ${BUILD_ENV})
+
 	ExternalProject_Add(binutils-binaries
 		${EP_OPTIONS_BINUTILS}
 		CONFIGURE_COMMAND
 			"${SOURCE_DIR_BINUTILS}/configure"
-				${CONFIGURE_ENV}
-				${BUILD_ENV}
 				${BINUTILS_ENV}
 				"--build=${TRIPLE_BUILD}"
 				"--host=${TRIPLE_HOST}"
@@ -329,13 +329,9 @@ if (BUILD_BINUTILS)
 				--enable-deterministic-archives
 		BUILD_COMMAND
 			$(MAKE)
-				${CONFIGURE_ENV}
-				${BUILD_ENV}
 				${BINUTILS_ENV}
 		INSTALL_COMMAND
 			$(MAKE)
-				${CONFIGURE_ENV}
-				${BUILD_ENV}
 				${BINUTILS_ENV}
 				"DESTDIR=${CMAKE_INSTALL_PREFIX}"
 				install-strip
