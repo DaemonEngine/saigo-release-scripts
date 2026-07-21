@@ -30,6 +30,8 @@ export nproc_count="$("${script_dir}/nproc")"
 export mem_count="$(echo "$(${script_dir}/freemem) 8" | awk '{r = int($1 / $2); print (r < 1 ? 1 : r)}')"
 export safer_count="$(echo "${nproc_count} ${mem_count}" | awk '{print ($1 < $2 ? $1 : $2)}')"
 
+DO_BUILD="${DO_BUILD:-ON}"
+
 if [ -z "${USE_CCACHE:-}" ]
 then
 	if command -v ccache >/dev/null 2>&1
@@ -78,8 +80,6 @@ do
 		echo "WARN: Missing ${target_name} configuration" >&2
 		continue
 	fi
-
-	echo "Building ${target_name}"
 
 	cmake_args=(-S "${repo_dir}" -G'Unix Makefiles')
 
@@ -165,8 +165,17 @@ do
 
 	build_dir="${repo_dir}/build/${target_name}${NAME_SUFFIX}"
 
-	cmake -B "${build_dir}" "${cmake_args[@]}"
-	cmake --build "${build_dir}"
+	echo "Configuring ${target_name}"
 
-	find "${build_dir}/install" -type d -exec rmdir {} \; 2>/dev/null || true
+	cmake -B "${build_dir}" "${cmake_args[@]}"
+
+	case "${DO_BUILD}" in
+	'ON')
+		echo "Building ${target_name}"
+
+		cmake --build "${build_dir}"
+
+		find "${build_dir}/install" -type d -exec rmdir {} \; 2>/dev/null || true
+		;;
+	esac
 done
