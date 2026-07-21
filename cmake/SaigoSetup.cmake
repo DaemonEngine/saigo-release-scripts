@@ -1,3 +1,5 @@
+set(PATCHES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/patches")
+
 option(CLONE_SHARED_REPOSITORIES "Clone shared sources dir (and only do that)." OFF)
 
 if (CLONE_SHARED_REPOSITORIES)
